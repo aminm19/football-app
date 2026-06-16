@@ -9,7 +9,7 @@ Joga bonito.
 - **Frontend:** React, Vite, React Router (in progress)
 - **Backend:** Node.js, Express
 - **Database:** PostgreSQL (hosted on Neon)
-- **External APIs:** [sports data API — TBD], OpenAI/Anthropic for match summaries
+- **External APIs:** API-Football, OpenAI/Anthropic for match summaries
 - **Deployment:** Vercel (frontend), Railway (backend) — pending
 
 ## Architecture
