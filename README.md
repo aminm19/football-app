@@ -18,5 +18,5 @@ The backend acts as an aggregation layer between the frontend and external servi
 ## Progress
 - [x] Database schema designed and deployed
 - [x] Postgres connection set up
-- [ ] Connection pooling
+- [x] Connection pooling
 - [ ] Sports API integration and caching
