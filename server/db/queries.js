@@ -12,3 +12,50 @@ async function getMatch(fixtureID){
     return result.rows[0];
 }
 
+async function saveMatch(m){
+    await pool.query(
+        `INSERT INTO matches (
+            fixture_id, match_date, status_short,
+            league_id, league_name, season, round,
+            home_team_id, home_team, home_logo,
+            away_team_id, away_team, away_logo,
+            home_goals, away_goals, penalty_home, penalty_away,
+            summary,
+            events, lineups, statistics, players
+        )
+        VALUES (
+            $1, $2, $3,
+            $4, $5, $6, $7,
+            $8, $9, $10,
+            $11, $12, $13,
+            $14, $15, $16, $17,
+            $18,
+            $19, $20, $21, $22
+        ) 
+        ON CONFLICT (fixture_id) DO UPDATE SET
+            status_short = EXCLUDED.status_short,
+            home_goals   = EXCLUDED.home_goals,
+            away_goals   = EXCLUDED.away_goals,
+            penalty_home = EXCLUDED.penalty_home,
+            penalty_away = EXCLUDED.penalty_away,
+            summary      = EXCLUDED.summary,
+            events       = EXCLUDED.events,
+            lineups      = EXCLUDED.lineups,
+            statistics   = EXCLUDED.statistics,
+            players      = EXCLUDED.players`,
+        [
+            m.fixture_id, m.match_date, m.status_short,
+            m.league_id, m.league_name, m.season, m.round,
+            m.home_team_id, m.home_team, m.home_logo,
+            m.away_team_id, m.away_team, m.away_logo,
+            m.home_goals, m.away_goals, m.penalty_home, m.penalty_away,
+            m.summary,
+            JSON.stringify(m.events),
+            JSON.stringify(m.lineups),
+            JSON.stringify(m.statistics),
+            JSON.stringify(m.players),
+        ]
+    );
+}
+
+module.exports = { getMatch, saveMatch };

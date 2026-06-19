@@ -1,5 +1,6 @@
 function parseMatch(fixture) {
   return {
+    // set to match db column names
     fixture_id:   fixture.fixture.id,
     match_date:   fixture.fixture.date,
     status_short: fixture.fixture.status.short,
@@ -18,8 +19,9 @@ function parseMatch(fixture) {
 
     home_goals:   fixture.goals.home,
     away_goals:   fixture.goals.away,
-    penalty_home: fixture.score.penalty.home,
-    penalty_away: fixture.score.penalty.away,
+    // matches that dont go to penalties may not have this data
+    penalty_home: fixture.score?.penalty?.home ?? null,
+    penalty_away: fixture.score?.penalty?.away ?? null,
 
     events:       fixture.events,
     lineups:      fixture.lineups,
