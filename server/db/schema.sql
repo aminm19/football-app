@@ -37,3 +37,11 @@ CREATE TABLE standings (
   cached_at TIMESTAMPTZ DEFAULT NOW(),
   PRIMARY KEY (league_id, season)
 );
+
+CREATE TABLE teams (
+  team_id INTEGER NOT NULL,
+  season INTEGER NOT NULL,
+  data JSONB NOT NULL,
+  cached_at TIMESTAMPTZ DEFAULT NOW(),
+  PRIMARY KEY (team_id, season)
+);

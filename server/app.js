@@ -3,8 +3,11 @@ const app = express();
 const matchesRouter = require('./routes/matches');
 const standingsRouter = require('./routes/standings');
 const cors = require('cors');
+const teamsRouter = require('./routes/teams');
 
 app.use(cors());
+
+app.use('/api/teams', teamsRouter);
 app.use('/api/standings', standingsRouter);
 app.use('/api/matches', matchesRouter);
 

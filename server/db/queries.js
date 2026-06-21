@@ -76,4 +76,22 @@ async function saveStandings(leagueId, season, data) {
   );
 }
 
-module.exports = { getMatch, saveMatch, getStandings, saveStandings };
+async function getTeam(teamId, season) {
+  const result = await pool.query(
+    'SELECT data, cached_at FROM teams WHERE team_id = $1 AND season = $2',
+    [teamId, season]
+  );
+  return result.rows[0];
+}
+
+async function saveTeam(teamId, season, data) {
+  await pool.query(
+    `INSERT INTO teams (team_id, season, data, cached_at)
+     VALUES ($1, $2, $3, NOW())
+     ON CONFLICT (team_id, season)
+     DO UPDATE SET data = $3, cached_at = NOW()`,
+    [teamId, season, JSON.stringify(data)]
+  );
+}
+
+module.exports = { getMatch, saveMatch, getStandings, saveStandings, getTeam, saveTeam };
