@@ -58,4 +58,22 @@ async function saveMatch(m){
     );
 }
 
-module.exports = { getMatch, saveMatch };
+async function getStandings(leagueId, season) {
+  const result = await pool.query(
+    'SELECT data, cached_at FROM standings WHERE league_id = $1 AND season = $2',
+    [leagueId, season]
+  );
+  return result.rows[0]; // { data, cached_at } or undefined
+}
+
+async function saveStandings(leagueId, season, data) {
+  await pool.query(
+    `INSERT INTO standings (league_id, season, data, cached_at)
+     VALUES ($1, $2, $3, NOW())
+     ON CONFLICT (league_id, season)
+     DO UPDATE SET data = $3, cached_at = NOW()`,
+    [leagueId, season, JSON.stringify(data)]
+  );
+}
+
+module.exports = { getMatch, saveMatch, getStandings, saveStandings };

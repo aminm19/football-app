@@ -4,6 +4,18 @@ const { getMatch, saveMatch } = require('../db/queries');
 const parseMatch = require('../utils/parseMatch');
 const callApiFootball = require('../utils/apiFootball');
 
+const MAJOR_LEAGUES = new Set([
+  // top five football leagues plus major cup competitions
+  1,   // World Cup
+  2,   // UEFA Champions League
+  3,   // UEFA Europa League
+  39,  // Premier League
+  140, // La Liga
+  135, // Serie A
+  78,  // Bundesliga
+  61,  // Ligue 1
+]);
+
 const FINISHED_STATUSES = ['FT', 'AET', 'PEN'];
 
 // GET /api/matches?date=YYYY-MM-DD  → matches on a given date (pass-through, no cache)
@@ -34,7 +46,11 @@ router.get('/', async (req, res) => {
     }
 
     const data = await callApiFootball(endpoint);
-    const matches = data.response.map(parseMatch);
+    // filter matches by only the leagues we want
+    const matches = data.response
+    .map(parseMatch)
+    .filter((m) => MAJOR_LEAGUES.has(m.league_id));
+
     return res.json(matches);
 
   } catch (err) {

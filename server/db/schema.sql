@@ -29,3 +29,11 @@ CREATE TABLE matches (
 
   created_at     TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE TABLE standings (
+  league_id INTEGER NOT NULL,
+  season INTEGER NOT NULL,
+  data JSONB NOT NULL,
+  cached_at TIMESTAMPTZ DEFAULT NOW(),
+  PRIMARY KEY (league_id, season)
+);
