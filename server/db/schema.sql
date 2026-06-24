@@ -5,6 +5,7 @@ CREATE TABLE matches (
 
   league_id      INTEGER NOT NULL,
   league_name    VARCHAR(100) NOT NULL,
+  league_logo    TEXT,
   season         INTEGER NOT NULL,
   round          VARCHAR(100),
 

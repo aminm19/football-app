@@ -16,7 +16,7 @@ async function saveMatch(m){
     await pool.query(
         `INSERT INTO matches (
             fixture_id, match_date, status_short,
-            league_id, league_name, season, round,
+            league_id, league_name, league_logo, season, round,
             home_team_id, home_team, home_logo,
             away_team_id, away_team, away_logo,
             home_goals, away_goals, penalty_home, penalty_away,
@@ -25,12 +25,12 @@ async function saveMatch(m){
         )
         VALUES (
             $1, $2, $3,
-            $4, $5, $6, $7,
-            $8, $9, $10,
-            $11, $12, $13,
-            $14, $15, $16, $17,
-            $18,
-            $19, $20, $21, $22
+            $4, $5, $6, $7, $8,
+            $9, $10, $11,
+            $12, $13, $14,
+            $15, $16, $17, $18,
+            $19,
+            $20, $21, $22, $23
         ) 
         ON CONFLICT (fixture_id) DO UPDATE SET
             status_short = EXCLUDED.status_short,
@@ -45,7 +45,7 @@ async function saveMatch(m){
             players      = EXCLUDED.players`,
         [
             m.fixture_id, m.match_date, m.status_short,
-            m.league_id, m.league_name, m.season, m.round,
+            m.league_id, m.league_name,  m.league_logo, m.season, m.round,
             m.home_team_id, m.home_team, m.home_logo,
             m.away_team_id, m.away_team, m.away_logo,
             m.home_goals, m.away_goals, m.penalty_home, m.penalty_away,

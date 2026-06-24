@@ -1,0 +1,161 @@
+import { Box, Flex, Image, Text, Table, Stack } from '@chakra-ui/react';
+
+// map a description string to a zone key via keyword matching
+function zoneOf(description) {
+  if (!description) return null;
+  const d = description.toLowerCase();
+  if (d.includes('champions league')) return 'ucl';
+  if (d.includes('europa league')) return 'uel';
+  if (d.includes('conference')) return 'uecl';
+  if (d.includes('relegation')) return 'releg';
+  return null;
+}
+
+const ZONE_COLORS = {
+  ucl: { bar: 'blue.400', label: 'Champions League' },
+  uel: { bar: 'orange.400', label: 'Europa League' },
+  uecl: { bar: 'green.400', label: 'Conference League' },
+  releg: { bar: 'red.500', label: 'Relegation' },
+};
+
+const FORM_COLORS = {
+  W: 'green.500',
+  D: 'gray.500',
+  L: 'red.500',
+};
+
+function FormPills({ form }) {
+  if (!form) return null;
+  return (
+    <Flex gap="2px">
+      {form.split('').map((r, i) => (
+        <Flex
+          key={i}
+          align="center"
+          justify="center"
+          boxSize="16px"
+          borderRadius="sm"
+          bg={FORM_COLORS[r] ?? 'gray.600'}
+          fontSize="9px"
+          fontWeight="bold"
+          color="white"
+        >
+          {r}
+        </Flex>
+      ))}
+    </Flex>
+  );
+}
+
+function StandingsTable({ standings }) {
+  if (!standings?.groups?.length) {
+    return <Text color="gray.400">No standings available.</Text>;
+  }
+
+  // collect which zones actually appear, for the legend
+  const presentZones = new Set();
+  standings.groups.forEach((g) =>
+    g.rows.forEach((row) => {
+      const z = zoneOf(row.description);
+      if (z) presentZones.add(z);
+    })
+  );
+
+  return (
+    <Box bg="blackAlpha.300" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="lg" overflow="hidden" p={4}>
+      <Stack gap={4}>
+        {standings.league && (
+            <Flex align="center" gap={2} px={2}>
+                {standings.league.logo && (
+                <Image src={standings.league.logo} alt={standings.league.name} boxSize="20px" />
+                )}
+                <Text fontWeight="medium">
+                {standings.league.name}
+                </Text>
+                <Text fontSize="sm" color="gray.400">
+                {standings.league.season}/{standings.league.season + 1}
+                </Text>
+            </Flex>
+            )}
+      {standings.groups.map((group) => (
+        <Box key={group.name}>
+          {/* group name — only show if more than one group (tournaments) */}
+          {standings.groups.length > 1 && (
+            <Text fontWeight="medium" mb={2} px={2}>
+              {group.name}
+            </Text>
+          )}
+
+          <Table.Root size="sm">
+            <Table.Header>
+              <Table.Row>
+                <Table.ColumnHeader>#</Table.ColumnHeader>
+                <Table.ColumnHeader>Team</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="center">P</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="center">W</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="center">D</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="center">L</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="center">GD</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="center">Pts</Table.ColumnHeader>
+                <Table.ColumnHeader>Form</Table.ColumnHeader>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
+              {group.rows.map((row) => {
+                const zone = zoneOf(row.description);
+                const barColor = zone ? ZONE_COLORS[zone].bar : 'transparent';
+                return (
+                  <Table.Row key={row.teamId}>
+                    <Table.Cell>
+                      <Flex align="center">
+                        {/* zone color bar */}
+                        <Box w="3px" h="20px" bg={barColor} mr={2} borderRadius="full" />
+                        {row.rank}
+                      </Flex>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <Flex align="center" gap={2}>
+                        <Image src={row.logo} alt={row.team} boxSize="18px" />
+                        <Text>{row.team}</Text>
+                      </Flex>
+                    </Table.Cell>
+                    <Table.Cell textAlign="center">{row.played}</Table.Cell>
+                    <Table.Cell textAlign="center">{row.win}</Table.Cell>
+                    <Table.Cell textAlign="center">{row.draw}</Table.Cell>
+                    <Table.Cell textAlign="center">{row.lose}</Table.Cell>
+                    <Table.Cell textAlign="center">
+                      {row.goalsDiff > 0 ? `+${row.goalsDiff}` : row.goalsDiff}
+                    </Table.Cell>
+                    <Table.Cell textAlign="center" fontWeight="bold">
+                      {row.points}
+                    </Table.Cell>
+                    <Table.Cell>
+                      <FormPills form={row.form} />
+                    </Table.Cell>
+                  </Table.Row>
+                );
+              })}
+            </Table.Body>
+          </Table.Root>
+        </Box>
+      ))}
+
+      {/* legend — only zones actually present */}
+      {presentZones.size > 0 && (
+        <Flex gap={4} wrap="wrap" px={2}>
+          {[...presentZones].map((z) => (
+            <Flex key={z} align="center" gap={2}>
+              <Box w="10px" h="10px" bg={ZONE_COLORS[z].bar} borderRadius="full" />
+              <Text fontSize="xs" color="gray.400">
+                {ZONE_COLORS[z].label}
+              </Text>
+            </Flex>
+          ))}
+        </Flex>
+      )}
+    </Stack>
+    </Box>
+  );
+}
+
+export default StandingsTable;

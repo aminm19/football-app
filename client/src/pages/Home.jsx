@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { getMatchesByDate } from '../api.js';
 const tz = Intl.DateTimeFormat().resolvedOptions().timeZone; // "America/Los_Angeles"
 import { Button } from '@chakra-ui/react';
 import { Container } from '@chakra-ui/react';
-import { Stack } from '@chakra-ui/react';
 import MatchRow from '../components/MatchRow.jsx';
+import { Stack, Box, Flex, Heading, Image } from '@chakra-ui/react';
 
 function localToday() {
   const now = new Date(); // the browser's local time
@@ -48,6 +47,11 @@ function Home() {
   if (error) return <p>Error: {error}</p>;
   if (matches.length === 0) return <p>No major matches on {date}.</p>;
 
+  const grouped = matches.reduce((acc, m) => {
+  (acc[m.league_id] ??= []).push(m);
+  return acc;
+}, {});
+
   return (
     <Container maxW="container.md" py={6}>
     <div>
@@ -57,11 +61,45 @@ function Home() {
         <span>{date}</span>
         <Button onClick={() => goToDay(1)}>Tomorrow →</Button>
       </div>
-            <Stack gap={1}>
-                {matches.map((m) => (
-                    <MatchRow key={m.fixture_id} match={m} />
-                ))}
+            <Stack gap={4}>
+  {Object.values(grouped).map((leagueMatches) => {
+    const first = leagueMatches[0]; // any match carries the league info
+    return (
+      <Box
+        key={first.league_id}
+        borderWidth="1px"
+        borderColor="whiteAlpha.200"
+        borderRadius="lg"
+        overflow="hidden"
+      >
+        {/* league header */}
+        <Flex align="center" gap={2} px={3} py={2} bg="whiteAlpha.50">
+          {first.league_logo && (
+            <Image
+              src={first.league_logo}
+              alt={first.league_name}
+              boxSize="20px"
+            />
+          )}
+          <Heading size="sm">{first.league_name}</Heading>
+        </Flex>
+
+        {/* matches, thin line between each */}
+        <Stack gap={0}>
+          {leagueMatches.map((m, i) => (
+            <Box
+              key={m.fixture_id}
+              borderTopWidth={i === 0 ? '0' : '1px'}
+              borderColor="whiteAlpha.200"
+            >
+              <MatchRow match={m} />
+            </Box>
+          ))}
         </Stack>
+      </Box>
+    );
+  })}
+</Stack>
         </div>
     </Container>
   );
