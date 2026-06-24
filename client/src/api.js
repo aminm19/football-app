@@ -4,15 +4,26 @@ const BASE = import.meta.env.VITE_API_URL;
 async function get(path) {
   const res = await fetch(`${BASE}${path}`);
   if (!res.ok) {
-    throw new Error(`Request failed: ${res.status}`);
+    // try to read the backend's { error: "..." } message; fall back to status
+    let message = `Request failed: ${res.status}`;
+    try {
+      const body = await res.json();
+      if (body && body.error) message = body.error;
+    } catch {
+      // response had no JSON body — keep the status-based message
+    }
+    throw new Error(message);
   }
   return res.json();
 }
 
 // matches
-export function getMatchesByDate(date) {
-  // omit date → backend defaults to today
-  return get(date ? `/api/matches?date=${date}` : '/api/matches');
+export function getMatchesByDate(date, timezone) {
+  const params = new URLSearchParams();
+  if (date) params.set('date', date);
+  if (timezone) params.set('timezone', timezone);
+  const qs = params.toString();
+  return get(`/api/matches${qs ? `?${qs}` : ''}`);
 }
 
 export function getMatchesByLeague(league, season) {
