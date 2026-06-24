@@ -21,7 +21,7 @@ const FINISHED_STATUSES = ['FT', 'AET', 'PEN'];
 // GET /api/matches?date=YYYY-MM-DD  → matches on a given date (pass-through, no cache)
 // modified to also return matches for a specific league and season
 router.get('/', async (req, res) => {
-  let { date, league, season } = req.query;
+  let { date, league, season, timezone } = req.query;
 
   try {
     let endpoint;
@@ -38,11 +38,13 @@ router.get('/', async (req, res) => {
       }
       endpoint = `/fixtures?league=${league}&season=${season}`;
     } else {
-      // date matches (default to today)
       if (!date) {
         date = new Date().toISOString().split('T')[0];
       }
       endpoint = `/fixtures?date=${date}`;
+      if (timezone) {
+        endpoint += `&timezone=${encodeURIComponent(timezone)}`;
+      }
     }
 
     const data = await callApiFootball(endpoint);
@@ -55,6 +57,12 @@ router.get('/', async (req, res) => {
 
   } catch (err) {
     console.error('Error in GET /api/matches:', err);
+    if (err.message.includes('plan')) {
+      return res.status(503).json({
+        // this catches free plan limitations for available matches
+        error: 'Matches for this date are not available on the current plan.',
+      });
+    }
     return res.status(502).json({ error: 'Failed to fetch matches' });
   }
 });

@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getMatchesByDate } from '../api.js';
 const tz = Intl.DateTimeFormat().resolvedOptions().timeZone; // "America/Los_Angeles"
+import { Button } from '@chakra-ui/react';
+import { Container } from '@chakra-ui/react';
+import { Stack } from '@chakra-ui/react';
+import MatchRow from '../components/MatchRow.jsx';
 
 function localToday() {
   const now = new Date(); // the browser's local time
@@ -45,25 +49,21 @@ function Home() {
   if (matches.length === 0) return <p>No major matches on {date}.</p>;
 
   return (
+    <Container maxW="container.md" py={6}>
     <div>
       <h1>Matches</h1>
       <div>
-        <button onClick={() => goToDay(-1)}>← Yesterday</button>
+        <Button onClick={() => goToDay(-1)}>← Yesterday</Button>
         <span>{date}</span>
-        <button onClick={() => goToDay(1)}>Tomorrow →</button>
+        <Button onClick={() => goToDay(1)}>Tomorrow →</Button>
       </div>
-      <ul>
-        {matches.map((m) => (
-          <li key={m.fixture_id}>
-            <Link to={`/match/${m.fixture_id}`}>
-              {m.home_team} {m.home_goals ?? ''} – {m.away_goals ?? ''}{' '}
-              {m.away_team}
-              {' '}({m.status_short})
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
+            <Stack gap={1}>
+                {matches.map((m) => (
+                    <MatchRow key={m.fixture_id} match={m} />
+                ))}
+        </Stack>
+        </div>
+    </Container>
   );
 }
 

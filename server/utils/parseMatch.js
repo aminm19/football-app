@@ -7,6 +7,7 @@ function parseMatch(fixture) {
 
     league_id:    fixture.league.id,
     league_name:  fixture.league.name,
+    league_logo: fixture.league.logo,
     season:       fixture.league.season,
     round:        fixture.league.round,
 
