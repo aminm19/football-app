@@ -1,4 +1,5 @@
 import { Box, Flex, Image, Text, Table, Stack } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 
 // map a description string to a zone key via keyword matching
 function zoneOf(description) {
@@ -48,6 +49,7 @@ function FormPills({ form }) {
 }
 
 function StandingsTable({ standings }) {
+  const navigate = useNavigate();
   if (!standings?.groups?.length) {
     return <Text color="gray.400">No standings available.</Text>;
   }
@@ -105,7 +107,12 @@ function StandingsTable({ standings }) {
                 const zone = zoneOf(row.description);
                 const barColor = zone ? ZONE_COLORS[zone].bar : 'transparent';
                 return (
-                  <Table.Row key={row.teamId}>
+                  <Table.Row
+                    key={row.teamId}
+                    onClick={() => navigate(`/team/${row.teamId}?season=${standings.league.season}`)}
+                    cursor="pointer"
+                    _hover={{ bg: 'whiteAlpha.100' }}
+                  >
                     <Table.Cell>
                       <Flex align="center">
                         {/* zone color bar */}

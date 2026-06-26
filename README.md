@@ -3,10 +3,10 @@
 A full-stack football tracker — live scores, standings, lineups, team profiles, and AI-generated match summaries.
 Joga bonito.
 
-**Status:** In active development. Backend complete and tested against live data; frontend and deployment in progress.
+**Status:** In active development. Backend complete and tested against live data; frontend pages built; LLM summaries and deployment in progress.
 
 ## Stack
-- **Frontend:** React, Vite, React Router (in progress)
+- **Frontend:** React, Vite, React Router, Chakra UI
 - **Backend:** Node.js, Express
 - **Database:** PostgreSQL (hosted on Neon)
 - **External APIs:** API-Football, OpenAI/Anthropic for match summaries (planned)
@@ -35,6 +35,6 @@ Standings and team data depend on the API's paid tier; these features sit behind
 - [x] Standings route with season-aware caching
 - [x] Team route (profile + fixtures) with caching
 - [x] Paid-feature toggle with graceful degradation
-- [ ] React frontend (home, match, league, team pages)
+- [x] React frontend (home, match, league, team pages)
 - [ ] LLM match summaries
 - [ ] Deployment

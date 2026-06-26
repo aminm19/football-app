@@ -33,31 +33,31 @@ function MatchRow({ match }) {
       to={`/match/${fixture_id}`}
       align="center"
       justify="space-between"
-      py={2}
-      px={3}
+      py={3}
+      px={4}
       _hover={{ bg: 'whiteAlpha.100' }}
       borderRadius="md"
     >
       {/* home team */}
-      <Flex align="center" gap={2} flex={1}>
-        <Image src={home_logo} alt={home_team} boxSize="20px" />
-        <Text>{home_team}</Text>
+      <Flex align="center" gap={3} flex={1}>
+        <Image src={home_logo} alt={home_team} boxSize="28px" objectFit="contain" />
+        <Text fontSize="md">{home_team}</Text>
       </Flex>
 
       {/* center: score or kickoff time */}
-      <Box minW="60px" textAlign="center" fontWeight="bold">
+      <Box minW="72px" textAlign="center" fontWeight="bold" fontSize="lg">
         {center}
       </Box>
 
       {/* away team */}
-      <Flex align="center" gap={2} flex={1} justify="flex-end">
-        <Text>{away_team}</Text>
-        <Image src={away_logo} alt={away_team} boxSize="20px" />
+      <Flex align="center" gap={3} flex={1} justify="flex-end">
+        <Text fontSize="md">{away_team}</Text>
+        <Image src={away_logo} alt={away_team} boxSize="28px" objectFit="contain" />
       </Flex>
 
       {/* status */}
       <Badge
-        ml={3}
+        ml={4}
         colorPalette={isFinished ? 'gray' : notStarted ? 'blue' : 'green'}
       >
         {status_short}

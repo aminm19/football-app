@@ -21,7 +21,8 @@ async function saveMatch(m){
             away_team_id, away_team, away_logo,
             home_goals, away_goals, penalty_home, penalty_away,
             summary,
-            events, lineups, statistics, players
+            events, lineups, statistics, players,
+            venue_name, venue_city, referee
         )
         VALUES (
             $1, $2, $3,
@@ -30,8 +31,9 @@ async function saveMatch(m){
             $12, $13, $14,
             $15, $16, $17, $18,
             $19,
-            $20, $21, $22, $23
-        ) 
+            $20, $21, $22, $23,
+            $24, $25, $26
+        )
         ON CONFLICT (fixture_id) DO UPDATE SET
             status_short = EXCLUDED.status_short,
             home_goals   = EXCLUDED.home_goals,
@@ -42,7 +44,10 @@ async function saveMatch(m){
             events       = EXCLUDED.events,
             lineups      = EXCLUDED.lineups,
             statistics   = EXCLUDED.statistics,
-            players      = EXCLUDED.players`,
+            players      = EXCLUDED.players,
+            venue_name   = EXCLUDED.venue_name,
+            venue_city   = EXCLUDED.venue_city,
+            referee      = EXCLUDED.referee`,
         [
             m.fixture_id, m.match_date, m.status_short,
             m.league_id, m.league_name,  m.league_logo, m.season, m.round,
@@ -54,6 +59,7 @@ async function saveMatch(m){
             JSON.stringify(m.lineups),
             JSON.stringify(m.statistics),
             JSON.stringify(m.players),
+            m.venue_name, m.venue_city, m.referee,
         ]
     );
 }

@@ -11,6 +11,10 @@ function parseMatch(fixture) {
     season:       fixture.league.season,
     round:        fixture.league.round,
 
+    venue_name:   fixture.fixture.venue?.name ?? null,
+    venue_city:   fixture.fixture.venue?.city ?? null,
+    referee:      fixture.fixture.referee ?? null,
+
     home_team_id: fixture.teams.home.id,
     home_team:    fixture.teams.home.name,
     home_logo:    fixture.teams.home.logo,

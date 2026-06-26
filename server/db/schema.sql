@@ -9,6 +9,10 @@ CREATE TABLE matches (
   season         INTEGER NOT NULL,
   round          VARCHAR(100),
 
+  venue_name     TEXT,
+  venue_city     TEXT,
+  referee        TEXT,
+
   home_team_id   INTEGER NOT NULL,
   home_team      VARCHAR(100) NOT NULL,
   home_logo      TEXT,

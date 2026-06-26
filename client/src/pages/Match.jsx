@@ -1,10 +1,42 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link as RouterLink } from 'react-router-dom';
+import { IoCalendarOutline } from 'react-icons/io5';
+import { MdStadium } from 'react-icons/md';
+import { GiWhistle } from 'react-icons/gi';
 import { getMatch, getConfig } from '../api.js';
 import {
   Box, Flex, Image, Text, Heading, Spinner, Stack, Tabs,
 } from '@chakra-ui/react';
 import StandingsTab from '../components/StandingsTab.jsx';
+import EventsTimeline from '../components/EventsTimeline.jsx';
+import LineupsPitch from '../components/LineupsPitch.jsx';
+
+// live HH:MM:SS countdown to kickoff (kickoff times are absolute, so this is timezone-safe)
+function Countdown({ target }) {
+  const [remaining, setRemaining] = useState(() => new Date(target) - Date.now());
+  useEffect(() => {
+    const tick = () => setRemaining(new Date(target) - Date.now());
+    tick();
+    const intervalId = setInterval(tick, 1000);
+    return () => clearInterval(intervalId);
+  }, [target]);
+
+  if (remaining <= 0) return null;
+  const totalSec = Math.floor(remaining / 1000);
+  const h = String(Math.floor(totalSec / 3600)).padStart(2, '0');
+  const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
+  const s = String(totalSec % 60).padStart(2, '0');
+  return <Text fontSize="sm" color="gray.400" fontVariantNumeric="tabular-nums">{h}:{m}:{s}</Text>;
+}
+
+function MetaItem({ icon: Icon, children }) {
+  return (
+    <Flex align="center" gap={1.5} color="gray.400">
+      <Box fontSize="14px" display="flex"><Icon /></Box>
+      <Text fontSize="xs">{children}</Text>
+    </Flex>
+  );
+}
 
 function Match() {
   const { id } = useParams();
@@ -32,7 +64,8 @@ function Match() {
   const {
     status_short, home_team, away_team, home_logo, away_logo,
     home_goals, away_goals, match_date, league_name, league_logo, round,
-    events, lineups,
+    venue_name, venue_city, referee,
+    events, lineups, players,
   } = match;
 
   const notStarted = status_short === 'NS';
@@ -64,28 +97,81 @@ function Match() {
       <Box borderTopWidth="1px" borderColor="whiteAlpha.200" />
 
       {/* meta row */}
-      <Flex align="center" justify="center" py={2}>
-        <Text fontSize="xs" color="gray.400">
+      <Flex align="center" justify="center" gap={4} wrap="wrap" px={4} py={3}>
+        <MetaItem icon={IoCalendarOutline}>
           {new Date(match_date).toLocaleString([], {
             weekday: 'short', month: 'short', day: 'numeric',
             hour: 'numeric', minute: '2-digit',
           })}
-        </Text>
+        </MetaItem>
+        {venue_name && (
+          <MetaItem icon={MdStadium}>
+            {venue_city ? `${venue_name}, ${venue_city}` : venue_name}
+          </MetaItem>
+        )}
+        {referee && <MetaItem icon={GiWhistle}>{referee}</MetaItem>}
       </Flex>
 
       {/* score row */}
       <Flex align="center" px={6} py={6}>
-        <Flex flex={1} align="center" justify="flex-end" gap={3}>
-          <Text fontSize="lg" fontWeight="semibold" textAlign="right">{home_team}</Text>
-          <Image src={home_logo} alt={home_team} boxSize="48px" />
+        <Flex
+          flex={1}
+          align="center"
+          justify="flex-end"
+          gap={3}
+          as={RouterLink}
+          to={`/team/${match.home_team_id}?season=${match.season}`}
+          className="group"
+          cursor="pointer"
+        >
+          <Text
+            fontSize="lg"
+            fontWeight="semibold"
+            textAlign="right"
+            _groupHover={{ textDecoration: 'underline' }}
+          >
+            {home_team}
+          </Text>
+          <Image
+            src={home_logo}
+            alt={home_team}
+            boxSize="48px"
+            transition="filter 0.15s"
+            _groupHover={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.7))' }}
+          />
         </Flex>
-        <Stack align="center" minW="90px" gap={0}>
+        <Stack align="center" minW="120px" px={6} gap={1}>
           <Heading size="xl">{centerText}</Heading>
-          <Text fontSize="sm" color="gray.400">{subLabel}</Text>
+          {notStarted ? (
+            <Countdown target={match_date} />
+          ) : (
+            <Text fontSize="sm" color="gray.400">{subLabel}</Text>
+          )}
         </Stack>
-        <Flex flex={1} align="center" justify="flex-start" gap={3}>
-          <Image src={away_logo} alt={away_team} boxSize="48px" />
-          <Text fontSize="lg" fontWeight="semibold">{away_team}</Text>
+        <Flex
+          flex={1}
+          align="center"
+          justify="flex-start"
+          gap={3}
+          as={RouterLink}
+          to={`/team/${match.away_team_id}?season=${match.season}`}
+          className="group"
+          cursor="pointer"
+        >
+          <Image
+            src={away_logo}
+            alt={away_team}
+            boxSize="48px"
+            transition="filter 0.15s"
+            _groupHover={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.7))' }}
+          />
+          <Text
+            fontSize="lg"
+            fontWeight="semibold"
+            _groupHover={{ textDecoration: 'underline' }}
+          >
+            {away_team}
+          </Text>
         </Flex>
       </Flex>
 
@@ -93,28 +179,40 @@ function Match() {
       {tabs.length > 0 && (
         <>
           <Box borderTopWidth="1px" borderColor="whiteAlpha.200" />
-          <Tabs.Root defaultValue={tabs[0].key}>
-            <Tabs.List px={4}>
+          <Tabs.Root defaultValue={tabs[0].key} colorPalette="green">
+            <Tabs.List px={4} css={{ '& [data-selected]': { '--indicator-color': 'transparent' } }}>
               {tabs.map((t) => (
                 <Tabs.Trigger key={t.key} value={t.key}>
                   {t.label}
                 </Tabs.Trigger>
               ))}
+              <Tabs.Indicator
+                css={{
+                  top: 'auto',
+                  bottom: '0',
+                  height: '3px',
+                  borderRadius: '9999px',
+                  background: 'var(--chakra-colors-green-400)',
+                  boxShadow: 'none',
+                  zIndex: 1,
+                }}
+              />
             </Tabs.List>
 
             {tabs.some((t) => t.key === 'events') && (
               <Tabs.Content value="events">
-                <Box p={4}>
-                  <Text color="gray.400">Events panel — coming next.</Text>
-                </Box>
+                <EventsTimeline events={events} homeTeamId={match.home_team_id} />
               </Tabs.Content>
             )}
 
             {tabs.some((t) => t.key === 'lineups') && (
               <Tabs.Content value="lineups">
-                <Box p={4}>
-                  <Text color="gray.400">Lineups panel — coming next.</Text>
-                </Box>
+                <LineupsPitch
+                  lineups={lineups}
+                  players={players}
+                  events={events}
+                  homeTeamId={match.home_team_id}
+                />
               </Tabs.Content>
             )}
 

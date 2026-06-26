@@ -9,10 +9,27 @@ function Layout() {
   return (
     <Container maxW="container.md" py={6}>
       <Flex as="nav" align="center" justify="space-between" mb={6}>
-        <Link as={RouterLink} to="/" fontWeight="bold" fontSize="lg">
+        <Link
+          as={RouterLink}
+          to="/"
+          fontFamily="'Bebas Neue', sans-serif"
+          fontSize="4xl"
+          letterSpacing="wider"
+          lineHeight={1}
+          color="white"
+          _hover={{ color: 'green.300', textDecoration: 'none' }}
+        >
           Total Football
         </Link>
-        <Link as={RouterLink} to="/">
+        <Link
+          as={RouterLink}
+          to="/"
+          fontFamily="'Bebas Neue', sans-serif"
+          fontSize="2xl"
+          letterSpacing="wide"
+          color="gray.300"
+          _hover={{ color: 'white', textDecoration: 'none' }}
+        >
           Home
         </Link>
       </Flex>
