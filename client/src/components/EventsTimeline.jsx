@@ -1,4 +1,4 @@
-import { Box, Flex, Text, Image } from '@chakra-ui/react';
+import { Box, Flex, Text } from '@chakra-ui/react';
 import { IoFootball } from 'react-icons/io5';
 import { HiArrowUp, HiArrowDown } from 'react-icons/hi2';
 

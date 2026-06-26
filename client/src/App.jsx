@@ -1,5 +1,5 @@
 import { Routes, Route, Outlet, Link as RouterLink } from 'react-router-dom';
-import { Container, Flex, Link, Text } from '@chakra-ui/react';
+import { Container, Flex, Link } from '@chakra-ui/react';
 import Home from './pages/Home.jsx';
 import Match from './pages/Match.jsx';
 import League from './pages/League.jsx';

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { getMatchesByLeague } from '../api.js';
 import {
-  Box, Stack, Heading, Text, Spinner, Button, ButtonGroup,
+  Stack, Heading, Text, Spinner, Button, ButtonGroup,
   Flex, IconButton, NativeSelect,
 } from '@chakra-ui/react';
 import MatchRow from '../components/MatchRow.jsx';
@@ -70,7 +70,7 @@ function League() {
     activeIndex === null
       ? defaultIndex
       : Math.min(Math.max(activeIndex, 0), slices.length - 1);
-  const [label, sliceMatches] = slices[currentIndex];
+  const [, sliceMatches] = slices[currentIndex];
 
   return (
     <Stack gap={4}>
