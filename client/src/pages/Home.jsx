@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import {
-  Container, Flex, Box, Stack, Heading, Image, Text, Spinner, IconButton,
+  Container, Flex, Box, Stack, Heading, Image, Text, Spinner, IconButton, Button, Popover,
 } from '@chakra-ui/react';
-import { HiChevronLeft, HiChevronRight } from 'react-icons/hi2';
+import { HiChevronLeft, HiChevronRight, HiChevronDown } from 'react-icons/hi2';
 import { getMatchesByDate, getConfig } from '../api.js';
+import { livePollMs } from '../utils/liveClock.js';
 import MatchRow from '../components/MatchRow.jsx';
+import MonthCalendar from '../components/MonthCalendar.jsx';
 
 const tz = Intl.DateTimeFormat().resolvedOptions().timeZone; // "America/Los_Angeles"
 
@@ -160,6 +162,7 @@ function Home() {
   const [error, setError] = useState(null);
   const [date, setDate] = useState(localToday());
   const [standingsEnabled, setStandingsEnabled] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   useEffect(() => {
     getConfig()
@@ -178,6 +181,17 @@ function Home() {
       })
       .finally(() => setLoading(false));
   }, [date]);
+
+  // if any match is live, re-fetch on the most urgent live cadence so minutes
+  // correct at HT/FT instead of ticking into the break
+  useEffect(() => {
+    const intervals = matches.map(livePollMs).filter(Boolean);
+    if (intervals.length === 0) return;
+    const timer = setTimeout(() => {
+      getMatchesByDate(date, tz).then(setMatches).catch(() => {});
+    }, Math.min(...intervals));
+    return () => clearTimeout(timer);
+  }, [matches, date]);
 
   return (
     <Container maxW="6xl" py={8}>
@@ -204,7 +218,33 @@ function Home() {
             >
               <HiChevronLeft />
             </IconButton>
-            <Text fontSize="lg" fontWeight="semibold">{dayLabel(date)}</Text>
+            <Popover.Root
+              open={calendarOpen}
+              onOpenChange={(e) => setCalendarOpen(e.open)}
+              positioning={{ placement: 'bottom' }}
+            >
+              <Popover.Trigger asChild>
+                <Button variant="ghost" size="sm" fontSize="lg" fontWeight="semibold" gap={1.5}>
+                  {dayLabel(date)}
+                  <Box
+                    as={HiChevronDown}
+                    transition="transform 0.15s"
+                    transform={calendarOpen ? 'rotate(180deg)' : undefined}
+                  />
+                </Button>
+              </Popover.Trigger>
+              <Popover.Positioner>
+                <Popover.Content bg="gray.800" borderWidth="1px" borderColor="whiteAlpha.200" w="auto">
+                  <Popover.Body>
+                    <MonthCalendar
+                      key={date}
+                      value={date}
+                      onSelect={(ds) => { setDate(ds); setCalendarOpen(false); }}
+                    />
+                  </Popover.Body>
+                </Popover.Content>
+              </Popover.Positioner>
+            </Popover.Root>
             <IconButton
               aria-label="Next day"
               variant="ghost"

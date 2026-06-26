@@ -169,10 +169,10 @@ function Divider({ label, home, away }) {
   );
 }
 
-function EventsTimeline({ events, homeTeamId }) {
+function EventsTimeline({ events, homeTeamId, finished }) {
   if (!events?.length) return <Text color="gray.400" p={4}>No events.</Text>;
 
-  // build the render list: running score + HT/FT dividers injected
+  // build chronologically so the running score is correct, then reverse for display
   const items = [];
   let home = 0;
   let away = 0;
@@ -189,7 +189,10 @@ function EventsTimeline({ events, homeTeamId }) {
     }
     items.push({ kind: 'event', event, home, away });
   }
-  items.push({ kind: 'divider', label: 'FT', home, away });
+  if (finished) items.push({ kind: 'divider', label: 'FT', home, away });
+
+  // most recent first
+  items.reverse();
 
   return (
     <Box px={4} py={2}>

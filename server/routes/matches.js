@@ -25,6 +25,7 @@ router.get('/', async (req, res) => {
 
   try {
     let endpoint;
+    let seasonDefaulted = false;
 
     if (league) {
       // league matches: API needs league + season
@@ -35,6 +36,7 @@ router.get('/', async (req, res) => {
         const year = now.getFullYear();
         const month = now.getMonth();   // 0-indexed: Jan=0, Aug=7
         season = month >= 7 ? year : year - 1;
+        seasonDefaulted = true;
       }
       endpoint = `/fixtures?league=${league}&season=${season}`;
     } else {
@@ -47,7 +49,19 @@ router.get('/', async (req, res) => {
       }
     }
 
-    const data = await callApiFootball(endpoint);
+    let data = await callApiFootball(endpoint);
+
+    // summer tournaments (e.g. World Cup) use calendar-year seasons, not the
+    // Aug–May span our default assumes. if the defaulted season came up empty,
+    // retry once with the current calendar year before giving up.
+    if (league && seasonDefaulted && data.response.length === 0) {
+      const year = new Date().getFullYear();
+      if (Number(season) !== year) {
+        season = year;
+        data = await callApiFootball(`/fixtures?league=${league}&season=${season}`);
+      }
+    }
+
     // filter matches by only the leagues we want
     const matches = data.response
     .map(parseMatch)

@@ -4,6 +4,10 @@ function parseMatch(fixture) {
     fixture_id:   fixture.fixture.id,
     match_date:   fixture.fixture.date,
     status_short: fixture.fixture.status.short,
+    // authoritative live match minute, plus stoppage time held in a separate field
+    // (e.g. during first-half stoppage: elapsed=45, extra=3 → "45+3")
+    elapsed:      fixture.fixture.status?.elapsed ?? null,
+    extra:        fixture.fixture.status?.extra ?? null,
 
     league_id:    fixture.league.id,
     league_name:  fixture.league.name,

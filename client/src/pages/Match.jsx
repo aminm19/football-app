@@ -10,6 +10,8 @@ import {
 import StandingsTab from '../components/StandingsTab.jsx';
 import EventsTimeline from '../components/EventsTimeline.jsx';
 import LineupsPitch from '../components/LineupsPitch.jsx';
+import { LiveClock } from '../components/LiveClock.jsx';
+import { isRunning, livePollMs } from '../utils/liveClock.js';
 
 // live HH:MM:SS countdown to kickoff (kickoff times are absolute, so this is timezone-safe)
 function Countdown({ target }) {
@@ -57,6 +59,18 @@ function Match() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  // while the match is live, re-fetch so the clock corrects at HT/FT and the
+  // score/events stay fresh. cadence tightens near each half's end (see livePollMs).
+  useEffect(() => {
+    if (!match) return;
+    const ms = livePollMs(match);
+    if (!ms) return;
+    const timer = setTimeout(() => {
+      getMatch(id).then(setMatch).catch(() => {});
+    }, ms);
+    return () => clearTimeout(timer);
+  }, [match, id]);
+
   if (loading) return <Spinner />;
   if (error) return <Text color="red.400">Error: {error}</Text>;
   if (!match) return <Text>Match not found.</Text>;
@@ -69,6 +83,7 @@ function Match() {
   } = match;
 
   const notStarted = status_short === 'NS';
+  const isFinished = ['FT', 'AET', 'PEN'].includes(status_short);
 
   const centerText = notStarted
     ? new Date(match_date).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
@@ -144,6 +159,8 @@ function Match() {
           <Heading size="xl">{centerText}</Heading>
           {notStarted ? (
             <Countdown target={match_date} />
+          ) : isRunning(status_short) ? (
+            <LiveClock match={match} fontSize="sm" fontWeight="semibold" color="green.300" />
           ) : (
             <Text fontSize="sm" color="gray.400">{subLabel}</Text>
           )}
@@ -201,7 +218,7 @@ function Match() {
 
             {tabs.some((t) => t.key === 'events') && (
               <Tabs.Content value="events">
-                <EventsTimeline events={events} homeTeamId={match.home_team_id} />
+                <EventsTimeline events={events} homeTeamId={match.home_team_id} finished={isFinished} />
               </Tabs.Content>
             )}
 

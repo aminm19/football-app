@@ -5,9 +5,17 @@ import { Box, Flex, Image, Text, Heading, Spinner, Stack, Badge, Tabs } from '@c
 import MatchRow from '../components/MatchRow.jsx';
 import StandingsTable from '../components/StandingsTable.jsx';
 
+// competitions that have no league table (so they can't drive the standings panel)
+const NO_TABLE_LEAGUES = new Set([10]); // Friendlies
+
+// most-played league that actually has a standings table (skips friendlies, so a
+// national team resolves to e.g. the World Cup instead of its friendlies)
 function getPrimaryLeagueId(matches) {
   const counts = {};
-  matches.forEach((m) => { counts[m.league_id] = (counts[m.league_id] || 0) + 1; });
+  matches.forEach((m) => {
+    if (NO_TABLE_LEAGUES.has(m.league_id)) return;
+    counts[m.league_id] = (counts[m.league_id] || 0) + 1;
+  });
   const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
   return top ? Number(top[0]) : null;
 }
@@ -44,8 +52,11 @@ function Team() {
         if (!config.standingsEnabled) return;
         return getTeam(id, season).then((teamData) => {
           setData(teamData);
-          const leagueId = getPrimaryLeagueId([...teamData.recent, ...teamData.upcoming]);
-          const resolvedSeason = season || teamData.recent[0]?.season || teamData.upcoming[0]?.season;
+          const fixtures = [...teamData.recent, ...teamData.upcoming];
+          const leagueId = getPrimaryLeagueId(fixtures);
+          // use the season of a fixture in the chosen league (falls back to the URL season)
+          const leagueMatch = fixtures.find((m) => m.league_id === leagueId);
+          const resolvedSeason = leagueMatch?.season ?? season;
           if (leagueId && resolvedSeason) {
             return getStandings(leagueId, resolvedSeason).then(setStandings).catch(() => {});
           }

@@ -1,5 +1,7 @@
 import { Link as RouterLink } from 'react-router-dom';
 import { Flex, Image, Text, Badge, Box } from '@chakra-ui/react';
+import { isRunning } from '../utils/liveClock.js';
+import { LiveMinute } from './LiveClock.jsx';
 
 const FINISHED = ['FT', 'AET', 'PEN'];
 
@@ -39,29 +41,37 @@ function MatchRow({ match }) {
       borderRadius="md"
     >
       {/* home team */}
-      <Flex align="center" gap={3} flex={1}>
-        <Image src={home_logo} alt={home_team} boxSize="28px" objectFit="contain" />
-        <Text fontSize="md">{home_team}</Text>
+      <Flex align="center" gap={3} flex={1} minW={0}>
+        <Image src={home_logo} alt={home_team} boxSize="28px" objectFit="contain" flexShrink={0} />
+        <Text fontSize="md" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
+          {home_team}
+        </Text>
       </Flex>
 
       {/* center: score or kickoff time */}
-      <Box minW="72px" textAlign="center" fontWeight="bold" fontSize="lg">
+      <Box minW="72px" textAlign="center" fontWeight="bold" fontSize="lg" flexShrink={0}>
         {center}
       </Box>
 
       {/* away team */}
-      <Flex align="center" gap={3} flex={1} justify="flex-end">
-        <Text fontSize="md">{away_team}</Text>
-        <Image src={away_logo} alt={away_team} boxSize="28px" objectFit="contain" />
+      <Flex align="center" gap={3} flex={1} minW={0} justify="flex-end">
+        <Text fontSize="md" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" textAlign="right">
+          {away_team}
+        </Text>
+        <Image src={away_logo} alt={away_team} boxSize="28px" objectFit="contain" flexShrink={0} />
       </Flex>
 
-      {/* status */}
-      <Badge
-        ml={4}
-        colorPalette={isFinished ? 'gray' : notStarted ? 'blue' : 'green'}
-      >
-        {status_short}
-      </Badge>
+      {/* status — live matches show the ticking minute */}
+      {isRunning(status_short) ? (
+        <LiveMinute match={match} ml={4} />
+      ) : (
+        <Badge
+          ml={4}
+          colorPalette={isFinished ? 'gray' : notStarted ? 'blue' : 'green'}
+        >
+          {status_short}
+        </Badge>
+      )}
     </Flex>
   );
 }

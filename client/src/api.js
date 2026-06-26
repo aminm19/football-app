@@ -35,6 +35,11 @@ export function getMatch(id) {
   return get(`/api/matches/${id}`);
 }
 
+// league metadata (name, country, logo, available seasons)
+export function getLeague(id) {
+  return get(`/api/leagues/${id}`);
+}
+
 // standings (toggle-gated)
 export function getStandings(league, season) {
   return get(`/api/standings?league=${league}&season=${season}`);

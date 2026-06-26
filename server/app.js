@@ -4,6 +4,7 @@ const matchesRouter = require('./routes/matches');
 const standingsRouter = require('./routes/standings');
 const cors = require('cors');
 const teamsRouter = require('./routes/teams');
+const leaguesRouter = require('./routes/leagues');
 const rateLimit = require('express-rate-limit');
 
 const apiLimiter = rateLimit({
@@ -25,6 +26,7 @@ app.use('/api', apiLimiter);
 app.use('/api/teams', teamsRouter);
 app.use('/api/standings', standingsRouter);
 app.use('/api/matches', matchesRouter);
+app.use('/api/leagues', leaguesRouter);
 
 app.get('/api/config', (req, res) => {
   res.json({ standingsEnabled: process.env.STANDINGS_ENABLED === 'true' });

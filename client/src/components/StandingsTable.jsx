@@ -88,18 +88,18 @@ function StandingsTable({ standings }) {
             </Text>
           )}
 
-          <Table.Root size="sm">
+          <Table.Root size="sm" tableLayout="fixed" width="full">
             <Table.Header>
               <Table.Row>
-                <Table.ColumnHeader>#</Table.ColumnHeader>
+                <Table.ColumnHeader w="52px">#</Table.ColumnHeader>
                 <Table.ColumnHeader>Team</Table.ColumnHeader>
-                <Table.ColumnHeader textAlign="center">P</Table.ColumnHeader>
-                <Table.ColumnHeader textAlign="center">W</Table.ColumnHeader>
-                <Table.ColumnHeader textAlign="center">D</Table.ColumnHeader>
-                <Table.ColumnHeader textAlign="center">L</Table.ColumnHeader>
-                <Table.ColumnHeader textAlign="center">GD</Table.ColumnHeader>
-                <Table.ColumnHeader textAlign="center">Pts</Table.ColumnHeader>
-                <Table.ColumnHeader>Form</Table.ColumnHeader>
+                <Table.ColumnHeader w="48px" textAlign="center">P</Table.ColumnHeader>
+                <Table.ColumnHeader w="48px" textAlign="center">W</Table.ColumnHeader>
+                <Table.ColumnHeader w="48px" textAlign="center">D</Table.ColumnHeader>
+                <Table.ColumnHeader w="48px" textAlign="center">L</Table.ColumnHeader>
+                <Table.ColumnHeader w="56px" textAlign="center">GD</Table.ColumnHeader>
+                <Table.ColumnHeader w="52px" textAlign="center">Pts</Table.ColumnHeader>
+                <Table.ColumnHeader w="110px">Form</Table.ColumnHeader>
               </Table.Row>
             </Table.Header>
             <Table.Body>
@@ -121,9 +121,11 @@ function StandingsTable({ standings }) {
                       </Flex>
                     </Table.Cell>
                     <Table.Cell>
-                      <Flex align="center" gap={2}>
-                        <Image src={row.logo} alt={row.team} boxSize="18px" />
-                        <Text>{row.team}</Text>
+                      <Flex align="center" gap={2} minW={0}>
+                        <Image src={row.logo} alt={row.team} boxSize="18px" flexShrink={0} />
+                        <Text whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
+                          {row.team}
+                        </Text>
                       </Flex>
                     </Table.Cell>
                     <Table.Cell textAlign="center">{row.played}</Table.Cell>
