@@ -206,7 +206,7 @@ function Team() {
             {/* standings */}
             {standings && (
               <Box bg="gray.800" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" overflow="hidden" p={4}>
-                <StandingsTable standings={standings} />
+                <StandingsTable standings={standings} highlightTeamIds={[teamId]} />
               </Box>
             )}
           </Stack>
@@ -216,7 +216,7 @@ function Team() {
         <Tabs.Content value="tables">
           {standings ? (
             <Box pt={4}>
-              <StandingsTable standings={standings} />
+              <StandingsTable standings={standings} highlightTeamIds={[teamId]} />
             </Box>
           ) : (
             <Text pt={4} color="gray.400">Standings unavailable.</Text>

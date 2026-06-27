@@ -236,7 +236,11 @@ function Match() {
             {tabs.some((t) => t.key === 'standings') && (
                 <Tabs.Content value="standings">
                     <Box p={4}>
-                    <StandingsTab league={match.league_id} season={match.season} />
+                    <StandingsTab
+                      league={match.league_id}
+                      season={match.season}
+                      highlightTeamIds={[match.home_team_id, match.away_team_id]}
+                    />
                     </Box>
                 </Tabs.Content>
                 )}

@@ -48,15 +48,24 @@ function FormPills({ form }) {
   );
 }
 
-function StandingsTable({ standings }) {
+function StandingsTable({ standings, highlightTeamIds }) {
   const navigate = useNavigate();
   if (!standings?.groups?.length) {
     return <Text color="gray.400">No standings available.</Text>;
   }
 
-  // collect which zones actually appear, for the legend
+  // subject teams (match: both sides; team page: one). when present, show only the
+  // group(s) those teams are in and shade their rows.
+  const highlight = new Set(highlightTeamIds ?? []);
+  const relevant = highlight.size > 0
+    ? standings.groups.filter((g) => g.rows.some((row) => highlight.has(row.teamId)))
+    : standings.groups;
+  // fall back to the full table if the subject teams aren't found (e.g. data mismatch)
+  const groups = relevant.length > 0 ? relevant : standings.groups;
+
+  // collect which zones actually appear (in the shown groups), for the legend
   const presentZones = new Set();
-  standings.groups.forEach((g) =>
+  groups.forEach((g) =>
     g.rows.forEach((row) => {
       const z = zoneOf(row.description);
       if (z) presentZones.add(z);
@@ -79,9 +88,9 @@ function StandingsTable({ standings }) {
                 </Text>
             </Flex>
             )}
-      {standings.groups.map((group) => (
+      {groups.map((group) => (
         <Box key={group.name}>
-          {/* group name — only show if more than one group (tournaments) */}
+          {/* group name — only show if more than one group exists in the source data */}
           {standings.groups.length > 1 && (
             <Text fontWeight="medium" mb={2} px={2}>
               {group.name}
@@ -106,12 +115,14 @@ function StandingsTable({ standings }) {
               {group.rows.map((row) => {
                 const zone = zoneOf(row.description);
                 const barColor = zone ? ZONE_COLORS[zone].bar : 'transparent';
+                const isSubject = highlight.has(row.teamId);
                 return (
                   <Table.Row
                     key={row.teamId}
                     onClick={() => navigate(`/team/${row.teamId}?season=${standings.league.season}`)}
                     cursor="pointer"
-                    _hover={{ bg: 'whiteAlpha.100' }}
+                    bg={isSubject ? 'whiteAlpha.100' : undefined}
+                    _hover={{ bg: isSubject ? 'whiteAlpha.200' : 'whiteAlpha.100' }}
                   >
                     <Table.Cell>
                       <Flex align="center">
