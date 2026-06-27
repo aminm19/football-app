@@ -8,7 +8,7 @@ const leaguesRouter = require('./routes/leagues');
 const rateLimit = require('express-rate-limit');
 
 const apiLimiter = rateLimit({
-  // since we have no auth set up for use accounts, we'll limit by IP
+  // no user accounts/auth, so rate-limit by IP
   windowMs: 60 * 1000, // 1 minute
   max: 100,            // max requests per IP per window
   standardHeaders: true,  // send RateLimit-* headers so clients can see their limit

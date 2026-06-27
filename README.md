@@ -1,19 +1,19 @@
 # Football App
 
-A full-stack football tracker — live scores, standings, lineups, team profiles, and AI-generated match summaries.
+A full-stack football tracker — live scores, live match clock, standings, lineups, team profiles, and knockout brackets.
 Joga bonito.
 
-**Status:** In active development. Backend complete and tested against live data; frontend pages built; LLM summaries and deployment in progress.
+**Status:** In active development. Backend and frontend feature-complete and tested against live data; deployment pending.
 
 ## Stack
 - **Frontend:** React, Vite, React Router, Chakra UI
 - **Backend:** Node.js, Express
 - **Database:** PostgreSQL (hosted on Neon)
-- **External APIs:** API-Football, OpenAI/Anthropic for match summaries (planned)
+- **External APIs:** API-Football
 - **Deployment:** Vercel (frontend), Railway/Render (backend) — pending
 
 ## Architecture
-The backend acts as an aggregation layer between the frontend and external services. It pulls data from a sports API, caches results in Postgres to avoid redundant requests against a rate-limited free tier, and (planned) uses an LLM to generate post-match analysis on demand.
+The backend acts as an aggregation layer between the frontend and external services. It pulls data from a sports API and caches results in Postgres to avoid redundant requests against a rate-limited tier.
 
 Caching is tuned to each data type's volatility: finished matches and historical standings are immutable and cached permanently, while current-season standings and team fixtures use a time-based TTL so live data stays fresh. Resource-based routers (matches, standings, teams) keep concerns separated, with shared parsers flattening the API's nested responses into the app's own schema.
 
@@ -25,6 +25,7 @@ Standings and team data depend on the API's paid tier; these features sit behind
 - `GET /api/matches/:id` — single match, cached when finished
 - `GET /api/standings?league=:id&season=:year` — league table (toggle-gated)
 - `GET /api/teams/:id?season=:year` — team profile + recent/upcoming fixtures (toggle-gated)
+- `GET /api/leagues/:id` — league metadata + available seasons (for the season selector)
 - `GET /api/config` — exposes feature flags to the frontend
 
 ## Progress
@@ -34,7 +35,8 @@ Standings and team data depend on the API's paid tier; these features sit behind
 - [x] Matches routes (by date, by league/season, by id) with caching
 - [x] Standings route with season-aware caching
 - [x] Team route (profile + fixtures) with caching
+- [x] League metadata route (available seasons)
 - [x] Paid-feature toggle with graceful degradation
 - [x] React frontend (home, match, league, team pages)
-- [ ] LLM match summaries
+- [x] Live match clock with stoppage-time handling
 - [ ] Deployment

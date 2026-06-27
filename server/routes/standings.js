@@ -57,6 +57,7 @@ router.get('/', async (req, res) => {
     await saveStandings(league, season, parsed);
     res.json(parsed);
   } catch (err) {
+    console.error('Error in GET /api/standings:', err);
     res.status(502).json({ error: 'Failed to fetch standings' });
   }
 });

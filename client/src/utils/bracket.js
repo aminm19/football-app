@@ -1,5 +1,3 @@
-// client/src/utils/bracket.js
-
 // Knockout rounds in bracket order, earliest to final.
 // We only build the bracket from these — group stage and qualifying are excluded.
 const KNOCKOUT_ORDER = [
