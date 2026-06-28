@@ -19,7 +19,8 @@ const apiLimiter = rateLimit({
 // TODO: enable at deploy — makes Express read the real client IP from
 // X-Forwarded-For instead of the hosting proxy's IP, so rate limiting keys
 // on actual visitors. Without it, all traffic looks like one IP (the proxy).
-// app.set('trust proxy', 1);
+// uncommented for production use
+app.set('trust proxy', 1);
 
 app.use(cors());
 app.use('/api', apiLimiter);
