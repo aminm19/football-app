@@ -12,7 +12,7 @@ function MinuteBadge({ time }) {
     <Flex
       boxSize="34px"
       borderRadius="full"
-      bg="gray.900"
+      bg="gray.950"
       borderWidth="1px"
       borderColor="whiteAlpha.200"
       align="center"

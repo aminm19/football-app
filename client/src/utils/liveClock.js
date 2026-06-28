@@ -5,6 +5,12 @@ export function isRunning(status) {
   return RUNNING_STATUSES.includes(status);
 }
 
+// any in-progress status (broader than isRunning — includes halftime/breaks)
+const LIVE_STATUSES = ['1H', '2H', 'HT', 'ET', 'BT', 'P'];
+export function isLive(status) {
+  return LIVE_STATUSES.includes(status);
+}
+
 // how often to re-fetch a live match so the clock corrects at HT/FT/half-changes.
 // relaxed during clean play, tighter near/after each half's end and during breaks.
 // returns null when the match isn't live (no polling needed).

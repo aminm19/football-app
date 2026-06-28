@@ -3,7 +3,7 @@ import { Spinner, Text } from '@chakra-ui/react';
 import { getStandings } from '../api.js';
 import StandingsTable from './StandingsTable.jsx';
 
-function StandingsTab({ league, season, highlightTeamIds }) {
+function StandingsTab({ league, season, highlightTeamIds, liveMatches }) {
   const [standings, setStandings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,7 +19,13 @@ function StandingsTab({ league, season, highlightTeamIds }) {
 
   if (loading) return <Spinner />;
   if (error) return <Text color="gray.400">Standings unavailable.</Text>;
-  return <StandingsTable standings={standings} highlightTeamIds={highlightTeamIds} />;
+  return (
+    <StandingsTable
+      standings={standings}
+      highlightTeamIds={highlightTeamIds}
+      liveMatches={liveMatches}
+    />
+  );
 }
 
 export default StandingsTab;

@@ -11,7 +11,7 @@ import StandingsTab from '../components/StandingsTab.jsx';
 import EventsTimeline from '../components/EventsTimeline.jsx';
 import LineupsPitch from '../components/LineupsPitch.jsx';
 import { LiveClock } from '../components/LiveClock.jsx';
-import { isRunning, livePollMs } from '../utils/liveClock.js';
+import { isRunning, isLive, livePollMs } from '../utils/liveClock.js';
 
 // live HH:MM:SS countdown to kickoff (kickoff times are absolute, so this is timezone-safe)
 function Countdown({ target }) {
@@ -100,7 +100,7 @@ function Match() {
   if (standingsEnabled) tabs.push({ key: 'standings', label: 'Standings' });
 
   return (
-    <Box bg="gray.800" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" overflow="hidden">
+    <Box bg="gray.900" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" overflow="hidden">
       {/* competition strip */}
       <Flex align="center" justify="center" gap={2} px={4} py={3}>
         {league_logo && <Image src={league_logo} alt={league_name} boxSize="18px" />}
@@ -240,6 +240,7 @@ function Match() {
                       league={match.league_id}
                       season={match.season}
                       highlightTeamIds={[match.home_team_id, match.away_team_id]}
+                      liveMatches={isLive(status_short) ? [match] : []}
                     />
                     </Box>
                 </Tabs.Content>

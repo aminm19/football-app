@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useSearchParams, Link as RouterLink } from 'react-router-dom';
 import { getTeam, getConfig, getStandings } from '../api.js';
+import { isLive } from '../utils/liveClock.js';
 import { Box, Flex, Image, Text, Heading, Spinner, Stack, Badge, Tabs } from '@chakra-ui/react';
 import MatchRow from '../components/MatchRow.jsx';
 import StandingsTable from '../components/StandingsTable.jsx';
@@ -72,13 +73,14 @@ function Team() {
   if (!data) return <Text>Team not found.</Text>;
 
   const { team, recent, upcoming } = data;
+  const liveMatches = [...recent, ...upcoming].filter((m) => isLive(m.status_short));
   const nextMatch = upcoming[0] ?? null;
   const formMatches = [...recent].reverse(); // oldest → newest, left to right
 
   return (
     <Stack gap={4}>
       {/* header */}
-      <Box bg="gray.800" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" p={6}>
+      <Box bg="gray.900" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" p={6}>
         <Flex align="center" gap={5}>
           {team.logo && <Image src={team.logo} alt={team.name} boxSize="80px" />}
           <Stack gap={1}>
@@ -123,7 +125,7 @@ function Team() {
             <Flex gap={4} align="stretch">
               {/* team form */}
               {formMatches.length > 0 && (
-                <Box flex={1} bg="gray.800" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" p={4}>
+                <Box flex={1} bg="gray.900" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" p={4}>
                   <Text fontWeight="semibold" mb={4}>Team form</Text>
                   <Flex gap={4}>
                     {formMatches.map((m) => {
@@ -173,7 +175,7 @@ function Team() {
                     flex={1}
                     as={RouterLink}
                     to={`/match/${m.fixture_id}`}
-                    bg="gray.800"
+                    bg="gray.900"
                     borderWidth="1px"
                     borderColor="whiteAlpha.200"
                     borderRadius="xl"
@@ -205,8 +207,8 @@ function Team() {
 
             {/* standings */}
             {standings && (
-              <Box bg="gray.800" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" overflow="hidden" p={4}>
-                <StandingsTable standings={standings} highlightTeamIds={[teamId]} />
+              <Box bg="gray.900" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" overflow="hidden" p={4}>
+                <StandingsTable standings={standings} highlightTeamIds={[teamId]} liveMatches={liveMatches} />
               </Box>
             )}
           </Stack>
@@ -216,7 +218,7 @@ function Team() {
         <Tabs.Content value="tables">
           {standings ? (
             <Box pt={4}>
-              <StandingsTable standings={standings} highlightTeamIds={[teamId]} />
+              <StandingsTable standings={standings} highlightTeamIds={[teamId]} liveMatches={liveMatches} />
             </Box>
           ) : (
             <Text pt={4} color="gray.400">Standings unavailable.</Text>
@@ -227,7 +229,7 @@ function Team() {
         <Tabs.Content value="fixtures">
           <Stack gap={4} pt={4}>
             {recent.length > 0 && (
-              <Box bg="gray.800" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" overflow="hidden">
+              <Box bg="gray.900" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" overflow="hidden">
                 <Flex align="center" px={3} py={2} bg="whiteAlpha.50">
                   <Heading size="sm">Recent</Heading>
                 </Flex>
@@ -241,7 +243,7 @@ function Team() {
               </Box>
             )}
             {upcoming.length > 0 && (
-              <Box bg="gray.800" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" overflow="hidden">
+              <Box bg="gray.900" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" overflow="hidden">
                 <Flex align="center" px={3} py={2} bg="whiteAlpha.50">
                   <Heading size="sm">Upcoming</Heading>
                 </Flex>

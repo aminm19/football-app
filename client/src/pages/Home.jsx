@@ -57,7 +57,7 @@ function TopLeaguesSidebar() {
     <Box
       w="320px"
       flexShrink={0}
-      bg="gray.800"
+      bg="gray.900"
       borderWidth="1px"
       borderColor="whiteAlpha.200"
       borderRadius="xl"
@@ -115,7 +115,7 @@ function MatchList({ loading, error, matches, date }) {
         return (
           <Box
             key={first.league_id}
-            bg="gray.800"
+            bg="gray.900"
             borderWidth="1px"
             borderColor="whiteAlpha.200"
             borderRadius="xl"
@@ -203,7 +203,7 @@ function Home() {
           <Flex
             align="center"
             justify="space-between"
-            bg="gray.800"
+            bg="gray.900"
             borderWidth="1px"
             borderColor="whiteAlpha.200"
             borderRadius="xl"
@@ -234,7 +234,7 @@ function Home() {
                 </Button>
               </Popover.Trigger>
               <Popover.Positioner>
-                <Popover.Content bg="gray.800" borderWidth="1px" borderColor="whiteAlpha.200" w="auto">
+                <Popover.Content bg="gray.900" borderWidth="1px" borderColor="whiteAlpha.200" w="auto">
                   <Popover.Body>
                     <MonthCalendar
                       key={date}

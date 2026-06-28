@@ -34,7 +34,7 @@ function TieBox({ tie, onClick }) {
     <Box
       onClick={onClick}
       cursor="pointer"
-      bg="gray.800"
+      bg="gray.900"
       borderWidth="1px"
       borderColor="whiteAlpha.200"
       borderRadius="md"

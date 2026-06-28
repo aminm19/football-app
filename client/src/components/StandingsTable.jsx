@@ -25,19 +25,46 @@ const FORM_COLORS = {
   L: 'red.500',
 };
 
+// map each team in an in-progress match to its provisional result + score (team's view)
+function buildLiveByTeam(liveMatches) {
+  const map = {};
+  (liveMatches ?? []).forEach((m) => {
+    const sides = [
+      { id: m.home_team_id, gf: m.home_goals ?? 0, ga: m.away_goals ?? 0 },
+      { id: m.away_team_id, gf: m.away_goals ?? 0, ga: m.home_goals ?? 0 },
+    ];
+    sides.forEach(({ id, gf, ga }) => {
+      const result = gf > ga ? 'W' : gf < ga ? 'L' : 'D';
+      map[id] = { gf, ga, result };
+    });
+  });
+  return map;
+}
+
+// colored live score chip — green winning / gray drawing / red losing (matches form pills)
+function LiveChip({ gf, ga, result }) {
+  return (
+    <Box bg={FORM_COLORS[result]} borderRadius="sm" px="6px" py="1px" flexShrink={0}>
+      <Text fontSize="11px" fontWeight="bold" color="white" lineHeight="1.5">
+        {gf}-{ga}
+      </Text>
+    </Box>
+  );
+}
+
 function FormPills({ form }) {
   if (!form) return null;
   return (
-    <Flex gap="2px">
+    <Flex gap="3px">
       {form.split('').map((r, i) => (
         <Flex
           key={i}
           align="center"
           justify="center"
-          boxSize="16px"
+          boxSize="22px"
           borderRadius="sm"
           bg={FORM_COLORS[r] ?? 'gray.600'}
-          fontSize="9px"
+          fontSize="11px"
           fontWeight="bold"
           color="white"
         >
@@ -48,11 +75,14 @@ function FormPills({ form }) {
   );
 }
 
-function StandingsTable({ standings, highlightTeamIds }) {
+function StandingsTable({ standings, highlightTeamIds, liveMatches }) {
   const navigate = useNavigate();
   if (!standings?.groups?.length) {
     return <Text color="gray.400">No standings available.</Text>;
   }
+
+  // provisional live result per team (not added to the official points — shown as a chip)
+  const liveByTeam = buildLiveByTeam(liveMatches);
 
   // subject teams (match: both sides; team page: one). when present, show only the
   // group(s) those teams are in and shade their rows.
@@ -73,7 +103,7 @@ function StandingsTable({ standings, highlightTeamIds }) {
   );
 
   return (
-    <Box bg="blackAlpha.300" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="lg" overflow="hidden" p={4}>
+    <Box bg="gray.900" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" overflow="hidden" p={4}>
       <Stack gap={4}>
         {standings.league && (
             <Flex align="center" gap={2} px={2}>
@@ -97,9 +127,9 @@ function StandingsTable({ standings, highlightTeamIds }) {
             </Text>
           )}
 
-          <Table.Root size="sm" tableLayout="fixed" width="full">
+          <Table.Root size="md" tableLayout="fixed" width="full">
             <Table.Header>
-              <Table.Row>
+              <Table.Row bg="transparent">
                 <Table.ColumnHeader w="52px">#</Table.ColumnHeader>
                 <Table.ColumnHeader>Team</Table.ColumnHeader>
                 <Table.ColumnHeader w="48px" textAlign="center">P</Table.ColumnHeader>
@@ -108,7 +138,7 @@ function StandingsTable({ standings, highlightTeamIds }) {
                 <Table.ColumnHeader w="48px" textAlign="center">L</Table.ColumnHeader>
                 <Table.ColumnHeader w="56px" textAlign="center">GD</Table.ColumnHeader>
                 <Table.ColumnHeader w="52px" textAlign="center">Pts</Table.ColumnHeader>
-                <Table.ColumnHeader w="110px">Form</Table.ColumnHeader>
+                <Table.ColumnHeader w="132px">Form</Table.ColumnHeader>
               </Table.Row>
             </Table.Header>
             <Table.Body>
@@ -121,7 +151,7 @@ function StandingsTable({ standings, highlightTeamIds }) {
                     key={row.teamId}
                     onClick={() => navigate(`/team/${row.teamId}?season=${standings.league.season}`)}
                     cursor="pointer"
-                    bg={isSubject ? 'whiteAlpha.100' : undefined}
+                    bg={isSubject ? 'whiteAlpha.100' : 'transparent'}
                     _hover={{ bg: isSubject ? 'whiteAlpha.200' : 'whiteAlpha.100' }}
                   >
                     <Table.Cell>
@@ -133,10 +163,11 @@ function StandingsTable({ standings, highlightTeamIds }) {
                     </Table.Cell>
                     <Table.Cell>
                       <Flex align="center" gap={2} minW={0}>
-                        <Image src={row.logo} alt={row.team} boxSize="18px" flexShrink={0} />
+                        <Image src={row.logo} alt={row.team} boxSize="20px" flexShrink={0} />
                         <Text whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
                           {row.team}
                         </Text>
+                        {liveByTeam[row.teamId] && <LiveChip {...liveByTeam[row.teamId]} />}
                       </Flex>
                     </Table.Cell>
                     <Table.Cell textAlign="center">{row.played}</Table.Cell>

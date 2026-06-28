@@ -326,7 +326,7 @@ function LineupsPitch({ lineups, players, events, homeTeamId }) {
     <Box p={4}>
       <Stack gap={4}>
         {/* header: home left, away right */}
-        <Box bg="gray.800" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="lg">
+        <Box bg="gray.900" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="lg">
           <Flex align="center" justify="space-between" px={3} py={2}>
             <Flex align="center" gap={2}>
               <Image src={home.team.logo} alt={home.team.name} boxSize="22px" />
@@ -386,7 +386,7 @@ function LineupsPitch({ lineups, players, events, homeTeamId }) {
         </Flex>
 
         {/* substitutes */}
-        <Box bg="gray.800" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="lg" p={4}>
+        <Box bg="gray.900" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="lg" p={4}>
           <Text fontWeight="semibold" fontSize="sm" mb={3} textAlign="center">Substitutes</Text>
           <Flex gap={6} align="flex-start">
             <SubsColumn lineup={home} ratings={ratings} photos={photos} captains={captains} subOn={subOn} align="left" />

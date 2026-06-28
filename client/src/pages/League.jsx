@@ -6,6 +6,7 @@ import {
 } from '@chakra-ui/react';
 import { HiChevronLeft, HiChevronRight } from 'react-icons/hi2';
 import { getMatchesByLeague, getLeague, getStandings, getConfig } from '../api.js';
+import { isLive } from '../utils/liveClock.js';
 import MatchRow from '../components/MatchRow.jsx';
 import Bracket from '../components/Bracket.jsx';
 import TieDialog from '../components/TieDialog.jsx';
@@ -150,6 +151,7 @@ function League() {
   const country = league?.country;
 
   const sorted = [...matches].sort((a, b) => new Date(a.match_date) - new Date(b.match_date));
+  const liveMatches = matches.filter((m) => isLive(m.status_short));
   const bracket = orderBracket(buildBracket(matches));
   const hasBracket = bracket.rounds.length > 0;
   const [featuredLabel, featuredMatches] = featuredRound(sorted);
@@ -184,7 +186,7 @@ function League() {
   return (
     <Stack gap={4}>
       {/* header card */}
-      <Box bg="gray.800" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" overflow="hidden">
+      <Box bg="gray.900" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" overflow="hidden">
         <Flex align="center" justify="space-between" px={5} py={4} gap={4} wrap="wrap">
           <Flex align="center" gap={4}>
             {logo && <Image src={logo} alt={name} boxSize="52px" objectFit="contain" />}
@@ -227,11 +229,11 @@ function League() {
         <Flex gap={4} align="flex-start" wrap="wrap">
           {standings && (
             <Box flex="1.6" minW="320px">
-              <StandingsTable standings={standings} />
+              <StandingsTable standings={standings} liveMatches={liveMatches} />
             </Box>
           )}
           <Box flex="1" minW="300px">
-            <Box bg="gray.800" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="lg" overflow="hidden">
+            <Box bg="gray.900" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="lg" overflow="hidden">
               {featuredLabel && (
                 <Flex align="center" px={4} py={3} bg="whiteAlpha.50">
                   <Text fontWeight="semibold" fontSize="sm">{featuredLabel}</Text>
@@ -254,7 +256,7 @@ function League() {
       {/* table */}
       {tab === 'table' && (
         standings
-          ? <StandingsTable standings={standings} />
+          ? <StandingsTable standings={standings} liveMatches={liveMatches} />
           : <Text color="gray.400">Standings unavailable for this competition.</Text>
       )}
 
@@ -265,7 +267,7 @@ function League() {
 
       {/* fixtures */}
       {tab === 'fixtures' && (
-        <Box bg="gray.800" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" overflow="hidden">
+        <Box bg="gray.900" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" overflow="hidden">
           {/* grouping toggle */}
           <Flex gap={2} px={4} pt={4} pb={3}>
             <PillToggle active={mode === 'date'} onClick={() => { setMode('date'); setActiveIndex(null); }}>

@@ -39,7 +39,7 @@ function TieDialog({ tie, open, onClose }) {
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>
-          <Dialog.Content bg="gray.800">
+          <Dialog.Content bg="gray.900">
             <Dialog.Header>
               <Dialog.Title>
                 {tie?.legs.length > 1 ? 'Two-legged tie' : 'Match'}
