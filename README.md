@@ -6,6 +6,8 @@ Joga bonito.
 
 **[Live demo →](https://football-app-ebon.vercel.app)**
 
+![Football App](./screenshots/screenshot1.png)
+
 ## Stack
 
 - **Frontend:** React, Vite, React Router, Chakra UI
