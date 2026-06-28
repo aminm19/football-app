@@ -6,7 +6,7 @@ Joga bonito.
 
 **[Live demo →](https://football-app-ebon.vercel.app)**
 
-![Football App](./screenshots/screenshot1.png)
+![Football App](./screenshots/Screenshot1.png)
 
 ## Stack
 
