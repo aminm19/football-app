@@ -35,4 +35,5 @@ app.get('/api/config', (req, res) => {
 
 app.get('/', (req, res) => res.send('server is alive'));
 
-app.listen(3000, () => console.log('server on port 3000'));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`server on port ${PORT}`));
