@@ -2,7 +2,7 @@
 
 A full-stack football tracker — live scores, live match clock, standings, lineups, team profiles, and knockout brackets.
 
-Joga bonito.
+Joga bonito!
 
 **[Live demo →](https://football-app-ebon.vercel.app)**
 
