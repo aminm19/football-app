@@ -11,7 +11,7 @@ import MatchRow from '../components/MatchRow.jsx';
 import Bracket from '../components/Bracket.jsx';
 import TieDialog from '../components/TieDialog.jsx';
 import StandingsTable from '../components/StandingsTable.jsx';
-import { buildBracket, orderBracket, padBracket } from '../utils/bracket.js';
+import { buildKnockoutBracket } from '../utils/bracket.js';
 
 const FINISHED = ['FT', 'AET', 'PEN'];
 
@@ -159,7 +159,7 @@ function League() {
 
   const sorted = [...matches].sort((a, b) => new Date(a.match_date) - new Date(b.match_date));
   const liveMatches = matches.filter((m) => isLive(m.status_short));
-  const bracket = padBracket(orderBracket(buildBracket(matches)));
+  const bracket = buildKnockoutBracket(matches, Number(id));
   const hasBracket = bracket.rounds.length > 0;
   const [featuredLabel, featuredMatches] = featuredRound(sorted);
 

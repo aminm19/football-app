@@ -14,7 +14,7 @@ import Bracket from '../components/Bracket.jsx';
 import TieDialog from '../components/TieDialog.jsx';
 import { LiveClock } from '../components/LiveClock.jsx';
 import { isRunning, isLive, livePollMs } from '../utils/liveClock.js';
-import { buildBracket, orderBracket, padBracket, isKnockoutRound } from '../utils/bracket.js';
+import { buildKnockoutBracket, isKnockoutRound } from '../utils/bracket.js';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -131,7 +131,9 @@ function Match() {
     : status_short;
 
   const isKnockout = isKnockoutRound(round);
-  const bracket = bracketMatches?.length ? padBracket(orderBracket(buildBracket(bracketMatches))) : null;
+  const bracket = bracketMatches?.length
+    ? buildKnockoutBracket(bracketMatches, match.league_id)
+    : null;
 
   // build the available tab list, in order — only tabs with data/permission appear.
   // a knockout match shows the Bracket; a group match shows the group Standings.

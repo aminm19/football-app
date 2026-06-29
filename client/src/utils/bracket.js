@@ -1,3 +1,5 @@
+import { applyBracketTemplate } from './bracketTemplates.js';
+
 // Knockout rounds in bracket order, earliest to final.
 // We only build the bracket from these — group stage and qualifying are excluded.
 const KNOCKOUT_ORDER = [
@@ -120,6 +122,50 @@ export function padBracket(bracket) {
     rounds.push({ name: KNOCKOUT_ORDER[idx], ties: Array.from({ length: count }, placeholderTie) });
   }
   return { rounds };
+}
+
+// Order each round FORWARD from an already-ordered first round: round i's slot k is fed
+// by round i-1's slots 2k and 2k+1. A real tie is slotted by its feeders' winners; slots
+// whose feeders aren't decided stay blank. Used when a template fixes the first round, so
+// the whole tree keeps that order even before later rounds are drawn (and as they fill in).
+export function orderBracketForward(bracket) {
+  const rounds = bracket.rounds.map((r) => ({ ...r }));
+  for (let i = 1; i < rounds.length; i++) {
+    const prev = rounds[i - 1].ties;
+    const real = rounds[i].ties.filter((t) => !t.placeholder && t.teamA && t.teamB);
+    const used = new Set();
+    const ties = [];
+    for (let k = 0; k < Math.floor(prev.length / 2); k++) {
+      const fA = prev[2 * k];
+      const fB = prev[2 * k + 1];
+      let tie = null;
+      if (fA?.winnerId != null && fB?.winnerId != null) {
+        tie = real.find((t) =>
+          !used.has(t) &&
+          (t.teamA.id === fA.winnerId || t.teamB.id === fA.winnerId) &&
+          (t.teamA.id === fB.winnerId || t.teamB.id === fB.winnerId));
+      }
+      if (tie) used.add(tie);
+      ties.push(tie || placeholderTie());
+    }
+    rounds[i].ties = ties;
+  }
+  return { rounds };
+}
+
+// Full pipeline: build ties, then lay out the tree. If a competition has a hand-set
+// first-round template (e.g. the World Cup mid-tournament, where the API can't tell us the
+// tree), anchor on it and propagate forward so the order survives into later rounds.
+// Otherwise derive the tree backward from real advancement, then pad future rounds.
+export function buildKnockoutBracket(matches, leagueId) {
+  const built = buildBracket(matches);
+  if (built.rounds.length === 0) return built;
+
+  const templated = applyBracketTemplate(built, leagueId);
+  if (templated !== built) {
+    return orderBracketForward(padBracket(templated));
+  }
+  return padBracket(orderBracket(built));
 }
 
 // Pair a round's fixtures into ties. Two legs share the same two team ids
