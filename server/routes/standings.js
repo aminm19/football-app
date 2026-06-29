@@ -7,6 +7,42 @@ const { getStandings, saveStandings } = require('../db/queries');
 // if data in database was updated more than 1 hour ago, it's stale for current seasons
 const SEASON_TTL_MS = 1000 * 60 * 60; // 1 hour, for current-season tables
 
+// knockout rounds don't count toward a group/league table — exclude them from form
+const KNOCKOUT_ROUNDS = new Set([
+  'Round of 32', 'Round of 16', 'Quarter-finals', 'Semi-finals', 'Final',
+]);
+const FINISHED = ['FT', 'AET', 'PEN'];
+
+// The API's standings `form` is the team's current rolling form, which leaks
+// matches from later stages (e.g. a knockout game after the group stage). Recompute
+// each team's form from finished, non-knockout fixtures so it reflects this stage only.
+function computeForms(fixtures) {
+  const byTeam = new Map(); // teamId -> [{ date, result }]
+  for (const f of fixtures) {
+    if (KNOCKOUT_ROUNDS.has(f.league.round)) continue;
+    if (!FINISHED.includes(f.fixture.status.short)) continue;
+
+    const hg = f.goals.home;
+    const ag = f.goals.away;
+    const home = f.teams.home.id;
+    const away = f.teams.away.id;
+    const homeResult = hg > ag ? 'W' : hg < ag ? 'L' : 'D';
+    const awayResult = hg > ag ? 'L' : hg < ag ? 'W' : 'D';
+
+    if (!byTeam.has(home)) byTeam.set(home, []);
+    if (!byTeam.has(away)) byTeam.set(away, []);
+    byTeam.get(home).push({ date: f.fixture.date, result: homeResult });
+    byTeam.get(away).push({ date: f.fixture.date, result: awayResult });
+  }
+
+  const forms = {};
+  for (const [teamId, results] of byTeam) {
+    results.sort((a, b) => new Date(a.date) - new Date(b.date));
+    forms[teamId] = results.slice(-5).map((r) => r.result).join(''); // last 5, oldest→newest
+  }
+  return forms;
+}
+
 function isStale(cachedAt, season) {
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -54,6 +90,23 @@ router.get('/', async (req, res) => {
     }
 
     const parsed = parseStandings(leagueBlock);
+
+    // override the API's rolling form with stage-only (non-knockout) form
+    try {
+      const fixturesData = await callApiFootball(
+        `/fixtures?league=${league}&season=${season}`
+      );
+      const forms = computeForms(fixturesData.response || []);
+      parsed.groups.forEach((g) =>
+        g.rows.forEach((row) => {
+          if (forms[row.teamId] != null) row.form = forms[row.teamId];
+        })
+      );
+    } catch (formErr) {
+      console.error('Could not recompute standings form:', formErr.message);
+      // fall back to the API's form (better than failing the whole request)
+    }
+
     await saveStandings(league, season, parsed);
     res.json(parsed);
   } catch (err) {
