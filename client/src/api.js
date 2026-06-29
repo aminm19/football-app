@@ -40,6 +40,11 @@ export function getLeague(id) {
   return get(`/api/leagues/${id}`);
 }
 
+// { teamId: 3-letter code } for a competition+season (for compact bracket labels)
+export function getLeagueTeamCodes(id, season) {
+  return get(`/api/leagues/${id}/teams?season=${season}`);
+}
+
 // standings (toggle-gated)
 export function getStandings(league, season) {
   return get(`/api/standings?league=${league}&season=${season}`);

@@ -3,17 +3,32 @@ import { useParams, Link as RouterLink } from 'react-router-dom';
 import { IoCalendarOutline } from 'react-icons/io5';
 import { MdStadium } from 'react-icons/md';
 import { GiWhistle } from 'react-icons/gi';
-import { getMatch, getConfig } from '../api.js';
+import { getMatch, getConfig, getMatchesByLeague, getLeagueTeamCodes } from '../api.js';
 import {
   Box, Flex, Image, Text, Heading, Spinner, Stack, Tabs,
 } from '@chakra-ui/react';
 import StandingsTab from '../components/StandingsTab.jsx';
 import EventsTimeline from '../components/EventsTimeline.jsx';
 import LineupsPitch from '../components/LineupsPitch.jsx';
+import Bracket from '../components/Bracket.jsx';
+import TieDialog from '../components/TieDialog.jsx';
 import { LiveClock } from '../components/LiveClock.jsx';
 import { isRunning, isLive, livePollMs } from '../utils/liveClock.js';
+import { buildBracket, orderBracket, padBracket, isKnockoutRound } from '../utils/bracket.js';
 
-// live HH:MM:SS countdown to kickoff (kickoff times are absolute, so this is timezone-safe)
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+// whole calendar days from today to the match day (local midnight to local midnight),
+// so "days away" doesn't flip based on the current time of day
+function calendarDaysUntil(target) {
+  const now = new Date();
+  const match = new Date(target);
+  const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startMatch = new Date(match.getFullYear(), match.getMonth(), match.getDate());
+  return Math.round((startMatch - startToday) / DAY_MS);
+}
+
+// under 24h: live HH:MM:SS countdown; 24h+: clean "in N days" (calendar-based)
 function Countdown({ target }) {
   const [remaining, setRemaining] = useState(() => new Date(target) - Date.now());
   useEffect(() => {
@@ -24,6 +39,12 @@ function Countdown({ target }) {
   }, [target]);
 
   if (remaining <= 0) return null;
+
+  if (remaining >= DAY_MS) {
+    const days = calendarDaysUntil(target);
+    return <Text fontSize="sm" color="gray.400">in {days} {days === 1 ? 'day' : 'days'}</Text>;
+  }
+
   const totalSec = Math.floor(remaining / 1000);
   const h = String(Math.floor(totalSec / 3600)).padStart(2, '0');
   const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
@@ -46,6 +67,9 @@ function Match() {
   const [standingsEnabled, setStandingsEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [bracketMatches, setBracketMatches] = useState(null); // null = loading, [] = none
+  const [teamCodes, setTeamCodes] = useState({});
+  const [selectedTie, setSelectedTie] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -71,6 +95,19 @@ function Match() {
     return () => clearTimeout(timer);
   }, [match, id]);
 
+  // for a knockout match, pull the competition's fixtures to build its bracket.
+  // keyed on stable fields so the live poll's match updates don't re-fetch.
+  useEffect(() => {
+    if (!match || !isKnockoutRound(match.round)) { setBracketMatches(null); setTeamCodes({}); return; }
+    Promise.all([
+      getMatchesByLeague(match.league_id, match.season),
+      getLeagueTeamCodes(match.league_id, match.season).catch(() => ({})),
+    ])
+      .then(([ms, codes]) => { setBracketMatches(ms); setTeamCodes(codes); })
+      .catch(() => { setBracketMatches([]); setTeamCodes({}); });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [match?.league_id, match?.season, match?.round]);
+
   if (loading) return <Spinner />;
   if (error) return <Text color="red.400">Error: {error}</Text>;
   if (!match) return <Text>Match not found.</Text>;
@@ -93,11 +130,16 @@ function Match() {
     ? new Date(match_date).toLocaleDateString([], { month: 'short', day: 'numeric' })
     : status_short;
 
-  // build the available tab list, in order — only tabs with data/permission appear
+  const isKnockout = isKnockoutRound(round);
+  const bracket = bracketMatches?.length ? padBracket(orderBracket(buildBracket(bracketMatches))) : null;
+
+  // build the available tab list, in order — only tabs with data/permission appear.
+  // a knockout match shows the Bracket; a group match shows the group Standings.
   const tabs = [];
   if (events?.length) tabs.push({ key: 'events', label: 'Events' });
   if (lineups?.length) tabs.push({ key: 'lineups', label: 'Lineups' });
-  if (standingsEnabled) tabs.push({ key: 'standings', label: 'Standings' });
+  if (isKnockout) tabs.push({ key: 'bracket', label: 'Bracket' });
+  else if (standingsEnabled) tabs.push({ key: 'standings', label: 'Standings' });
 
   return (
     <Box bg="gray.900" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" overflow="hidden">
@@ -129,31 +171,31 @@ function Match() {
 
       {/* score row */}
       <Flex align="center" px={6} py={6}>
-        <Flex
-          flex={1}
-          align="center"
-          justify="flex-end"
-          gap={3}
-          as={RouterLink}
-          to={`/team/${match.home_team_id}?season=${match.season}`}
-          className="group"
-          cursor="pointer"
-        >
-          <Text
-            fontSize="lg"
-            fontWeight="semibold"
-            textAlign="right"
-            _groupHover={{ textDecoration: 'underline' }}
+        <Flex flex={1} justify="flex-end">
+          <Flex
+            align="center"
+            gap={3}
+            as={RouterLink}
+            to={`/team/${match.home_team_id}?season=${match.season}`}
+            className="group"
+            cursor="pointer"
           >
-            {home_team}
-          </Text>
-          <Image
-            src={home_logo}
-            alt={home_team}
-            boxSize="48px"
-            transition="filter 0.15s"
-            _groupHover={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.7))' }}
-          />
+            <Text
+              fontSize="lg"
+              fontWeight="semibold"
+              textAlign="right"
+              _groupHover={{ textDecoration: 'underline' }}
+            >
+              {home_team}
+            </Text>
+            <Image
+              src={home_logo}
+              alt={home_team}
+              boxSize="48px"
+              transition="filter 0.15s"
+              _groupHover={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.7))' }}
+            />
+          </Flex>
         </Flex>
         <Stack align="center" minW="120px" px={6} gap={1}>
           <Heading size="xl">{centerText}</Heading>
@@ -165,30 +207,30 @@ function Match() {
             <Text fontSize="sm" color="gray.400">{subLabel}</Text>
           )}
         </Stack>
-        <Flex
-          flex={1}
-          align="center"
-          justify="flex-start"
-          gap={3}
-          as={RouterLink}
-          to={`/team/${match.away_team_id}?season=${match.season}`}
-          className="group"
-          cursor="pointer"
-        >
-          <Image
-            src={away_logo}
-            alt={away_team}
-            boxSize="48px"
-            transition="filter 0.15s"
-            _groupHover={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.7))' }}
-          />
-          <Text
-            fontSize="lg"
-            fontWeight="semibold"
-            _groupHover={{ textDecoration: 'underline' }}
+        <Flex flex={1} justify="flex-start">
+          <Flex
+            align="center"
+            gap={3}
+            as={RouterLink}
+            to={`/team/${match.away_team_id}?season=${match.season}`}
+            className="group"
+            cursor="pointer"
           >
-            {away_team}
-          </Text>
+            <Image
+              src={away_logo}
+              alt={away_team}
+              boxSize="48px"
+              transition="filter 0.15s"
+              _groupHover={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.7))' }}
+            />
+            <Text
+              fontSize="lg"
+              fontWeight="semibold"
+              _groupHover={{ textDecoration: 'underline' }}
+            >
+              {away_team}
+            </Text>
+          </Flex>
         </Flex>
       </Flex>
 
@@ -245,9 +287,32 @@ function Match() {
                     </Box>
                 </Tabs.Content>
                 )}
+
+            {tabs.some((t) => t.key === 'bracket') && (
+              <Tabs.Content value="bracket">
+                {bracketMatches === null ? (
+                  <Flex justify="center" py={8}><Spinner /></Flex>
+                ) : (
+                  <Box px={2}>
+                    <Bracket
+                      bracket={bracket ?? { rounds: [] }}
+                      highlightTeamIds={[match.home_team_id, match.away_team_id]}
+                      teamCodes={teamCodes}
+                      onTieClick={(tie) => setSelectedTie(tie)}
+                    />
+                  </Box>
+                )}
+              </Tabs.Content>
+            )}
           </Tabs.Root>
         </>
       )}
+
+      <TieDialog
+        tie={selectedTie}
+        open={selectedTie !== null}
+        onClose={() => setSelectedTie(null)}
+      />
     </Box>
   );
 }

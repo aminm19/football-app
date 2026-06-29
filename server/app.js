@@ -22,7 +22,9 @@ const apiLimiter = rateLimit({
 // uncommented for production use
 app.set('trust proxy', 1);
 
-app.use(cors({ origin: 'https://football-app-ebon.vercel.app' }));
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://football-app-ebon.vercel.app'],
+}));
 app.use('/api', apiLimiter);
 app.use('/api/teams', teamsRouter);
 app.use('/api/standings', standingsRouter);

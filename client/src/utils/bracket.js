@@ -10,6 +10,11 @@ const KNOCKOUT_ORDER = [
 
 const FINISHED = ['FT', 'AET', 'PEN'];
 
+// is this round a knockout round (any competition, R32/R16 start both handled)?
+export function isKnockoutRound(round) {
+  return KNOCKOUT_ORDER.includes(round);
+}
+
 // Build a bracket structure from a flat list of competition matches.
 // Returns { rounds: [{ name, ties: [...] }] } in bracket order.
 export function buildBracket(matches) {
@@ -97,6 +102,26 @@ export function orderBracket(bracket) {
   return { rounds: orderedRounds };
 }
 
+function placeholderTie() {
+  return { teamA: null, teamB: null, aggA: null, aggB: null, legs: [], winnerId: null, placeholder: true };
+}
+
+// Pad an in-progress bracket with blank future rounds down to the final, so the
+// tree always renders in full — e.g. a World Cup still in the Round of 32 shows
+// R16/QF/SF/Final as TBD placeholders rather than a lone column.
+export function padBracket(bracket) {
+  if (bracket.rounds.length === 0) return bracket;
+  const rounds = [...bracket.rounds];
+  let idx = KNOCKOUT_ORDER.indexOf(rounds[rounds.length - 1].name);
+  let count = rounds[rounds.length - 1].ties.length;
+  while (count > 1 && idx >= 0 && idx < KNOCKOUT_ORDER.length - 1) {
+    idx += 1;
+    count = Math.ceil(count / 2);
+    rounds.push({ name: KNOCKOUT_ORDER[idx], ties: Array.from({ length: count }, placeholderTie) });
+  }
+  return { rounds };
+}
+
 // Pair a round's fixtures into ties. Two legs share the same two team ids
 // (regardless of which side was home). Key by the sorted id pair.
 function pairIntoTies(roundMatches) {
@@ -137,7 +162,10 @@ function makeTie(legs) {
     }
   }
 
-  return { teamA, teamB, aggA, aggB, legs, winnerId: null };
+  // a tie with no goals recorded yet hasn't kicked off — show blank, not "0 - 0"
+  const played = legs.some((l) => l.home_goals != null || l.away_goals != null);
+
+  return { teamA, teamB, aggA: played ? aggA : null, aggB: played ? aggB : null, legs, winnerId: null };
 }
 
 // The Final is a single match, but we wrap it in the same tie shape.

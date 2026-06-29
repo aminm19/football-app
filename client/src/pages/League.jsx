@@ -5,13 +5,13 @@ import {
   Flex, Image, IconButton, NativeSelect, Tabs,
 } from '@chakra-ui/react';
 import { HiChevronLeft, HiChevronRight } from 'react-icons/hi2';
-import { getMatchesByLeague, getLeague, getStandings, getConfig } from '../api.js';
+import { getMatchesByLeague, getLeague, getStandings, getConfig, getLeagueTeamCodes } from '../api.js';
 import { isLive } from '../utils/liveClock.js';
 import MatchRow from '../components/MatchRow.jsx';
 import Bracket from '../components/Bracket.jsx';
 import TieDialog from '../components/TieDialog.jsx';
 import StandingsTable from '../components/StandingsTable.jsx';
-import { buildBracket, orderBracket } from '../utils/bracket.js';
+import { buildBracket, orderBracket, padBracket } from '../utils/bracket.js';
 
 const FINISHED = ['FT', 'AET', 'PEN'];
 
@@ -109,6 +109,7 @@ function League() {
   const [standings, setStandings] = useState(null);
   const [standingsEnabled, setStandingsEnabled] = useState(false);
   const [seasonInUse, setSeasonInUse] = useState(null);
+  const [teamCodes, setTeamCodes] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -143,6 +144,12 @@ function League() {
     getStandings(id, seasonInUse).then(setStandings).catch(() => setStandings(null));
   }, [id, seasonInUse, standingsEnabled]);
 
+  // 3-letter team codes for compact bracket labels
+  useEffect(() => {
+    if (!seasonInUse) { setTeamCodes({}); return; }
+    getLeagueTeamCodes(id, seasonInUse).then(setTeamCodes).catch(() => setTeamCodes({}));
+  }, [id, seasonInUse]);
+
   if (loading) return <Flex justify="center" py={10}><Spinner /></Flex>;
   if (error) return <Text color="red.400">Error: {error}</Text>;
 
@@ -152,7 +159,7 @@ function League() {
 
   const sorted = [...matches].sort((a, b) => new Date(a.match_date) - new Date(b.match_date));
   const liveMatches = matches.filter((m) => isLive(m.status_short));
-  const bracket = orderBracket(buildBracket(matches));
+  const bracket = padBracket(orderBracket(buildBracket(matches)));
   const hasBracket = bracket.rounds.length > 0;
   const [featuredLabel, featuredMatches] = featuredRound(sorted);
 
@@ -262,7 +269,7 @@ function League() {
 
       {/* knockout */}
       {tab === 'knockout' && hasBracket && (
-        <Bracket bracket={bracket} onTieClick={(tie) => setSelectedTie(tie)} />
+        <Bracket bracket={bracket} teamCodes={teamCodes} onTieClick={(tie) => setSelectedTie(tie)} />
       )}
 
       {/* fixtures */}
