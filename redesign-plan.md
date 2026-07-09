@@ -59,10 +59,16 @@ High-end premium/agency, modeled on FotMob (reference screenshots studied in
   `fontFamily="body"`/`text.secondary` resting/`text.primary` hover. Visually
   verified on localhost:5173 — clean, balanced, no regressions.
 
-### 3. MatchRow + status badges
-- [ ] Tighten spacing/alignment, adopt tokenized colors, refine status badge
+### 3. MatchRow + status badges — DONE
+- [x] Tighten spacing/alignment, adopt tokenized colors, refine status badge
       styling, fix status-under-score layout.
 - Files: `client/src/components/MatchRow.jsx`.
+- Notes: replaced the heavy trailing status `Badge` with a small muted
+  uppercase caption under the score (`text.secondary` for FT, `accent.green`
+  for HT/live), fixing row symmetry (home | center | away). Score is now the
+  clear focal point, team names secondary, status least prominent — matches
+  FotMob's understated status treatment. Verified on Home (grouped lists)
+  and League Fixtures tab.
 
 ### 4. Home page
 - [ ] Restyle date-nav card, league-group cards, sidebar to new card/spacing
