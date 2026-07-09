@@ -145,6 +145,28 @@ High-end premium/agency, modeled on FotMob (reference screenshots studied in
   (raw values → named semantic tokens) is wanted there later.
 - Full app build verified clean end-to-end after all 9 units.
 
+## Post-review polish pass
+After the 9 units, user feedback: the app still read as flat/dull next to
+FotMob despite all the token work. Root-caused three concrete gaps and
+fixed them directly (not a new numbered unit, a system-wide tuning pass):
+1. **Home never got the aurora-gradient banner** — that trick was invented
+   in unit 5 (Match) *after* Home was already restyled in unit 4, and was
+   never retrofitted. Home's league-group header now uses the same
+   gradient recipe as Match/League, tying the whole app together.
+2. **No elevation** — flat fill + 1px border reads as "dead" on a
+   near-black canvas, where plain drop-shadows are nearly invisible.
+   Added a `shadow="card"` token (`theme.js`) combining a faint inset top
+   highlight with a soft ambient shadow, applied to every major card
+   across Home/Match/League/StandingsTable.
+3. **Insufficient canvas/surface contrast** — bumped `surface` (#16171c →
+   #1a1b21) and `surfaceRaised` (#1e1f26 → #23242c) for a more legible
+   layering jump. Also bumped MatchRow crest size 28px → 30px for more
+   visual presence.
+- Files touched: `client/src/theme.js`, `client/src/pages/Home.jsx`,
+  `client/src/pages/Match.jsx`, `client/src/pages/League.jsx`,
+  `client/src/components/MatchRow.jsx`, `client/src/components/StandingsTable.jsx`.
+- Build verified clean; visually verified Home/Match/League/Standings.
+
 ## Redesign complete
 All 9 planned units done and committed on the `redesign` branch. The app
 now has a FotMob-inspired dark design system: near-black canvas / charcoal

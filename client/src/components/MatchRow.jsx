@@ -45,7 +45,7 @@ function MatchRow({ match }) {
     >
       {/* home team */}
       <Flex align="center" gap={3} flex={1} minW={0}>
-        <Image src={home_logo} alt={home_team} boxSize="28px" objectFit="contain" flexShrink={0} />
+        <Image src={home_logo} alt={home_team} boxSize="30px" objectFit="contain" flexShrink={0} />
         <Text fontSize="md" color="text.primary" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
           {home_team}
         </Text>
@@ -81,7 +81,7 @@ function MatchRow({ match }) {
         <Text fontSize="md" color="text.primary" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis" textAlign="right">
           {away_team}
         </Text>
-        <Image src={away_logo} alt={away_team} boxSize="28px" objectFit="contain" flexShrink={0} />
+        <Image src={away_logo} alt={away_team} boxSize="30px" objectFit="contain" flexShrink={0} />
       </Flex>
     </Flex>
   );

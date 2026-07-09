@@ -12,9 +12,12 @@ const config = defineConfig({
     tokens: {
       colors: {
         // Two distinct dark levels so cards visually lift off the page.
+        // Surface levels are deliberately a bit lighter than a "safe" dark
+        // theme default — enough contrast against canvas to read as a
+        // distinct layer at a glance, not just a faint border.
         canvas: { value: '#0a0a0c' },
-        surface: { value: '#16171c' },
-        surfaceRaised: { value: '#1e1f26' },
+        surface: { value: '#1a1b21' },
+        surfaceRaised: { value: '#23242c' },
         // Nudge Chakra's own `black`/`gray.900` palette entries to match
         // `canvas`/`surface` above. The app's existing pages apply colors
         // ad hoc (`bg="gray.900"`, and the html/body bg driven by Chakra's
@@ -26,7 +29,7 @@ const config = defineConfig({
         // below.
         black: { value: '#0a0a0c' },
         gray: {
-          900: { value: '#16171c' },
+          900: { value: '#1a1b21' },
         },
       },
       fonts: {
@@ -35,6 +38,16 @@ const config = defineConfig({
         // Default sans for all body/UI text.
         body: {
           value: `'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif`,
+        },
+      },
+      shadows: {
+        // Elevation for dark-on-dark cards: a plain drop shadow is nearly
+        // invisible against a near-black canvas, so "lift" reads mainly
+        // through a faint inset top highlight (simulates light catching the
+        // card's top edge) plus a soft, fairly tight ambient shadow for
+        // gentle depth. Use via `shadow="card"` on card-level Box/Flex.
+        card: {
+          value: 'inset 0 1px 0 0 rgba(255,255,255,0.05), 0 8px 24px -12px rgba(0,0,0,0.65)',
         },
       },
     },

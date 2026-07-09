@@ -144,7 +144,7 @@ function Match() {
   else if (standingsEnabled) tabs.push({ key: 'standings', label: 'Standings' });
 
   return (
-    <Box bg="bg.surface" borderWidth="1px" borderColor="border.subtle" borderRadius="xl" overflow="hidden">
+    <Box bg="bg.surface" borderWidth="1px" borderColor="border.subtle" borderRadius="xl" shadow="card" overflow="hidden">
       {/* competition strip — aurora-gradient banner, the redesign's signature flourish */}
       <Box
         px={4}

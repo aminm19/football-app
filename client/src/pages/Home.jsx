@@ -61,6 +61,7 @@ function TopLeaguesSidebar() {
       borderWidth="1px"
       borderColor="border.subtle"
       borderRadius="xl"
+      shadow="card"
       overflow="hidden"
       display={{ base: 'none', md: 'block' }}
     >
@@ -131,8 +132,12 @@ function MatchList({ loading, error, matches, date }) {
             borderWidth="1px"
             borderColor="border.subtle"
             borderRadius="xl"
+            shadow="card"
             overflow="hidden"
           >
+            {/* aurora-gradient header strip — same recipe as Match/League
+                headers, so Home reads as part of the same designed system
+                instead of the one page that never got the treatment */}
             <Flex
               as={RouterLink}
               to={`/league/${first.league_id}`}
@@ -140,14 +145,29 @@ function MatchList({ loading, error, matches, date }) {
               gap={3}
               px={4}
               py={3.5}
-              bg="bg.raised"
               transition="filter 0.15s"
-              _hover={{ filter: 'brightness(1.12)' }}
+              _hover={{ filter: 'brightness(1.15)' }}
+              css={{
+                background: `
+                  radial-gradient(120% 220% at 8% 10%, rgba(56, 132, 255, 0.45), transparent 55%),
+                  radial-gradient(120% 220% at 50% -20%, rgba(16, 185, 129, 0.35), transparent 50%),
+                  radial-gradient(120% 220% at 92% 15%, rgba(232, 65, 66, 0.32), transparent 55%),
+                  linear-gradient(180deg, rgba(10, 10, 12, 0.05) 0%, var(--chakra-colors-surface) 100%)
+                `,
+              }}
             >
               {first.league_logo && (
-                <Image src={first.league_logo} alt={first.league_name} boxSize="24px" objectFit="contain" />
+                <Image
+                  src={first.league_logo}
+                  alt={first.league_name}
+                  boxSize="24px"
+                  objectFit="contain"
+                  filter="drop-shadow(0 1px 2px rgba(0,0,0,0.6))"
+                />
               )}
-              <Text fontSize="md" fontWeight="bold" color="text.primary">{first.league_name}</Text>
+              <Text fontSize="lg" fontWeight="bold" color="text.primary" textShadow="0 1px 3px rgba(0,0,0,0.5)">
+                {first.league_name}
+              </Text>
             </Flex>
             <Stack gap={0} py={1}>
               {leagueMatches.map((m, i) => (
@@ -218,6 +238,7 @@ function Home() {
             borderWidth="1px"
             borderColor="border.subtle"
             borderRadius="full"
+            shadow="card"
             px={2}
             py={2}
             mb={4}

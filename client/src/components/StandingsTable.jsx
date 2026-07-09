@@ -103,7 +103,7 @@ function StandingsTable({ standings, highlightTeamIds, liveMatches }) {
   );
 
   return (
-    <Box bg="bg.surface" borderWidth="1px" borderColor="border.subtle" borderRadius="xl" overflow="hidden" p={4}>
+    <Box bg="bg.surface" borderWidth="1px" borderColor="border.subtle" borderRadius="xl" shadow="card" overflow="hidden" p={4}>
       <Stack gap={4}>
         {standings.league && (
             <Flex align="center" gap={2} px={2}>

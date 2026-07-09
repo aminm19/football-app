@@ -204,7 +204,7 @@ function League() {
   return (
     <Stack gap={4}>
       {/* header card */}
-      <Box bg="bg.surface" borderWidth="1px" borderColor="border.subtle" borderRadius="xl" overflow="hidden">
+      <Box bg="bg.surface" borderWidth="1px" borderColor="border.subtle" borderRadius="xl" shadow="card" overflow="hidden">
         {/* aurora-gradient banner — same recipe as Match.jsx's competition strip */}
         <Box px={5} py={5} css={GRADIENT_BANNER_CSS}>
           <Flex align="center" justify="space-between" gap={4} wrap="wrap">
@@ -287,7 +287,7 @@ function League() {
             </Box>
           )}
           <Box flex="1" minW="300px">
-            <Box bg="bg.surface" borderWidth="1px" borderColor="border.subtle" borderRadius="lg" overflow="hidden">
+            <Box bg="bg.surface" borderWidth="1px" borderColor="border.subtle" borderRadius="lg" shadow="card" overflow="hidden">
               {featuredLabel && (
                 <Flex align="center" px={4} py={3} bg="bg.raised">
                   <Text fontWeight="semibold" fontSize="sm" color="text.primary">{featuredLabel}</Text>
@@ -321,7 +321,7 @@ function League() {
 
       {/* fixtures */}
       {tab === 'fixtures' && (
-        <Box bg="bg.surface" borderWidth="1px" borderColor="border.subtle" borderRadius="xl" overflow="hidden">
+        <Box bg="bg.surface" borderWidth="1px" borderColor="border.subtle" borderRadius="xl" shadow="card" overflow="hidden">
           {/* grouping toggle — segmented pill control */}
           <Flex gap={1} bg="bg.canvas" borderRadius="full" p={1} w="fit-content" mx={4} mt={4} mb={3}>
             <PillToggle active={mode === 'date'} onClick={() => { setMode('date'); setActiveIndex(null); }}>
