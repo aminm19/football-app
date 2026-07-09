@@ -127,9 +127,33 @@ High-end premium/agency, modeled on FotMob (reference screenshots studied in
   time a live/in-progress bracket is available. No connector lines added
   (still deferred). Verified visually including TieDialog.
 
-### 9. Consistency pass
-- [ ] Step back across the whole app, check for drift between restyled and
+### 9. Consistency pass — DONE
+- [x] Step back across the whole app, check for drift between restyled and
       not-yet-restyled areas, fix inconsistencies.
+- Swept Home, Match, League (all tabs), StandingsTable, Team page, and an
+  error state. Fixed one drift spot: `Team.jsx` still had raw `red.400`/
+  `gray.400` for its error/gated-tier text where every other page had
+  already migrated to `status.negative`/`text.secondary` — tokenized to
+  match.
+- Team page (`/team/:id`), `EventsTimeline.jsx`, and `LineupsPitch.jsx` are
+  more built-out than CLAUDE.md's "stub/placeholder" notes suggest, and
+  already read visually consistent with the rest of the app (they reuse
+  MatchRow/StandingsTable, and the raw `gray.900`/`whiteAlpha.*` they still
+  reference already resolve to the new palette via unit 1's token override).
+  They were never separate units in the approved plan, so left as-is rather
+  than scope-creeping — worth a follow-up unit if a full token migration
+  (raw values → named semantic tokens) is wanted there later.
+- Full app build verified clean end-to-end after all 9 units.
+
+## Redesign complete
+All 9 planned units done and committed on the `redesign` branch. The app
+now has a FotMob-inspired dark design system: near-black canvas / charcoal
+card layering, tokenized colors throughout the touched files, Inter body
+text + Bebas Neue wordmark, the signature aurora-gradient banner on
+Match/League headers, dense-but-legible standings, and a restyled knockout
+bracket. Deferred/out-of-scope by design: bracket connector lines, Team
+page full token migration, live-tournament bracket suppression (all
+pre-existing CLAUDE.md deferrals, untouched).
 
 ## Notes
 - Team page (`/team/:id`) is a functional stub per CLAUDE.md — not a

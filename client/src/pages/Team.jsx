@@ -68,8 +68,8 @@ function Team() {
   }, [id, season]);
 
   if (loading) return <Spinner />;
-  if (!standingsEnabled) return <Text color="gray.400">Team pages are not available on the free tier.</Text>;
-  if (error) return <Text color="red.400">Error: {error}</Text>;
+  if (!standingsEnabled) return <Text color="text.secondary">Team pages are not available on the free tier.</Text>;
+  if (error) return <Text color="status.negative">Error: {error}</Text>;
   if (!data) return <Text>Team not found.</Text>;
 
   const { team, recent, upcoming } = data;
