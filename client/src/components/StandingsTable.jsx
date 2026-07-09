@@ -13,16 +13,16 @@ function zoneOf(description) {
 }
 
 const ZONE_COLORS = {
-  ucl: { bar: 'blue.400', label: 'Champions League' },
-  uel: { bar: 'orange.400', label: 'Europa League' },
-  uecl: { bar: 'green.400', label: 'Conference League' },
-  releg: { bar: 'red.500', label: 'Relegation' },
+  ucl: { bar: 'zone.ucl', label: 'Champions League' },
+  uel: { bar: 'zone.uel', label: 'Europa League' },
+  uecl: { bar: 'zone.uecl', label: 'Conference League' },
+  releg: { bar: 'zone.relegation', label: 'Relegation' },
 };
 
 const FORM_COLORS = {
-  W: 'green.500',
+  W: 'status.positive',
   D: 'gray.500',
-  L: 'red.500',
+  L: 'status.negative',
 };
 
 // map each team in an in-progress match to its provisional result + score (team's view)
@@ -78,7 +78,7 @@ function FormPills({ form }) {
 function StandingsTable({ standings, highlightTeamIds, liveMatches }) {
   const navigate = useNavigate();
   if (!standings?.groups?.length) {
-    return <Text color="gray.400">No standings available.</Text>;
+    return <Text color="text.secondary">No standings available.</Text>;
   }
 
   // provisional live result per team (not added to the official points — shown as a chip)
@@ -103,17 +103,17 @@ function StandingsTable({ standings, highlightTeamIds, liveMatches }) {
   );
 
   return (
-    <Box bg="gray.900" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" overflow="hidden" p={4}>
+    <Box bg="bg.surface" borderWidth="1px" borderColor="border.subtle" borderRadius="xl" overflow="hidden" p={4}>
       <Stack gap={4}>
         {standings.league && (
             <Flex align="center" gap={2} px={2}>
                 {standings.league.logo && (
                 <Image src={standings.league.logo} alt={standings.league.name} boxSize="20px" />
                 )}
-                <Text fontWeight="medium">
+                <Text fontWeight="medium" color="text.primary">
                 {standings.league.name}
                 </Text>
-                <Text fontSize="sm" color="gray.400">
+                <Text fontSize="sm" color="text.secondary">
                 {standings.league.season}/{standings.league.season + 1}
                 </Text>
             </Flex>
@@ -122,23 +122,28 @@ function StandingsTable({ standings, highlightTeamIds, liveMatches }) {
         <Box key={group.name}>
           {/* group name — only show if more than one group exists in the source data */}
           {standings.groups.length > 1 && (
-            <Text fontWeight="medium" mb={2} px={2}>
+            <Text fontWeight="medium" color="text.primary" mb={2} px={2}>
               {group.name}
             </Text>
           )}
 
-          <Table.Root size="md" tableLayout="fixed" width="full">
+          <Table.Root
+            size="sm"
+            tableLayout="fixed"
+            width="full"
+            css={{ '& th, & td': { borderColor: 'border.muted' } }}
+          >
             <Table.Header>
               <Table.Row bg="transparent">
-                <Table.ColumnHeader w="52px">#</Table.ColumnHeader>
-                <Table.ColumnHeader>Team</Table.ColumnHeader>
-                <Table.ColumnHeader w="48px" textAlign="center">P</Table.ColumnHeader>
-                <Table.ColumnHeader w="48px" textAlign="center">W</Table.ColumnHeader>
-                <Table.ColumnHeader w="48px" textAlign="center">D</Table.ColumnHeader>
-                <Table.ColumnHeader w="48px" textAlign="center">L</Table.ColumnHeader>
-                <Table.ColumnHeader w="56px" textAlign="center">GD</Table.ColumnHeader>
-                <Table.ColumnHeader w="52px" textAlign="center">Pts</Table.ColumnHeader>
-                <Table.ColumnHeader w="132px">Form</Table.ColumnHeader>
+                <Table.ColumnHeader w="52px" fontSize="2xs" fontWeight="medium" textTransform="uppercase" letterSpacing="wide" color="text.secondary">#</Table.ColumnHeader>
+                <Table.ColumnHeader fontSize="2xs" fontWeight="medium" textTransform="uppercase" letterSpacing="wide" color="text.secondary">Team</Table.ColumnHeader>
+                <Table.ColumnHeader w="40px" textAlign="center" fontSize="2xs" fontWeight="medium" textTransform="uppercase" letterSpacing="wide" color="text.secondary">P</Table.ColumnHeader>
+                <Table.ColumnHeader w="40px" textAlign="center" fontSize="2xs" fontWeight="medium" textTransform="uppercase" letterSpacing="wide" color="text.secondary">W</Table.ColumnHeader>
+                <Table.ColumnHeader w="40px" textAlign="center" fontSize="2xs" fontWeight="medium" textTransform="uppercase" letterSpacing="wide" color="text.secondary">D</Table.ColumnHeader>
+                <Table.ColumnHeader w="40px" textAlign="center" fontSize="2xs" fontWeight="medium" textTransform="uppercase" letterSpacing="wide" color="text.secondary">L</Table.ColumnHeader>
+                <Table.ColumnHeader w="52px" textAlign="center" fontSize="2xs" fontWeight="medium" textTransform="uppercase" letterSpacing="wide" color="text.secondary">GD</Table.ColumnHeader>
+                <Table.ColumnHeader w="48px" textAlign="center" fontSize="2xs" fontWeight="medium" textTransform="uppercase" letterSpacing="wide" color="text.secondary">Pts</Table.ColumnHeader>
+                <Table.ColumnHeader w="132px" fontSize="2xs" fontWeight="medium" textTransform="uppercase" letterSpacing="wide" color="text.secondary">Form</Table.ColumnHeader>
               </Table.Row>
             </Table.Header>
             <Table.Body>
@@ -151,33 +156,33 @@ function StandingsTable({ standings, highlightTeamIds, liveMatches }) {
                     key={row.teamId}
                     onClick={() => navigate(`/team/${row.teamId}?season=${standings.league.season}`)}
                     cursor="pointer"
-                    bg={isSubject ? 'whiteAlpha.100' : 'transparent'}
-                    _hover={{ bg: isSubject ? 'whiteAlpha.200' : 'whiteAlpha.100' }}
+                    bg={isSubject ? 'bg.raised' : 'transparent'}
+                    _hover={{ bg: 'bg.raised' }}
                   >
                     <Table.Cell>
                       <Flex align="center">
                         {/* zone color bar */}
                         <Box w="3px" h="20px" bg={barColor} mr={2} borderRadius="full" />
-                        {row.rank}
+                        <Text color="text.secondary">{row.rank}</Text>
                       </Flex>
                     </Table.Cell>
                     <Table.Cell>
                       <Flex align="center" gap={2} minW={0}>
                         <Image src={row.logo} alt={row.team} boxSize="20px" flexShrink={0} />
-                        <Text whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
+                        <Text color="text.primary" fontWeight="medium" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
                           {row.team}
                         </Text>
                         {liveByTeam[row.teamId] && <LiveChip {...liveByTeam[row.teamId]} />}
                       </Flex>
                     </Table.Cell>
-                    <Table.Cell textAlign="center">{row.played}</Table.Cell>
-                    <Table.Cell textAlign="center">{row.win}</Table.Cell>
-                    <Table.Cell textAlign="center">{row.draw}</Table.Cell>
-                    <Table.Cell textAlign="center">{row.lose}</Table.Cell>
-                    <Table.Cell textAlign="center">
+                    <Table.Cell textAlign="center" color="text.secondary">{row.played}</Table.Cell>
+                    <Table.Cell textAlign="center" color="text.secondary">{row.win}</Table.Cell>
+                    <Table.Cell textAlign="center" color="text.secondary">{row.draw}</Table.Cell>
+                    <Table.Cell textAlign="center" color="text.secondary">{row.lose}</Table.Cell>
+                    <Table.Cell textAlign="center" color="text.secondary">
                       {row.goalsDiff > 0 ? `+${row.goalsDiff}` : row.goalsDiff}
                     </Table.Cell>
-                    <Table.Cell textAlign="center" fontWeight="bold">
+                    <Table.Cell textAlign="center" fontWeight="bold" color="text.primary">
                       {row.points}
                     </Table.Cell>
                     <Table.Cell>
@@ -197,7 +202,7 @@ function StandingsTable({ standings, highlightTeamIds, liveMatches }) {
           {[...presentZones].map((z) => (
             <Flex key={z} align="center" gap={2}>
               <Box w="10px" h="10px" bg={ZONE_COLORS[z].bar} borderRadius="full" />
-              <Text fontSize="xs" color="gray.400">
+              <Text fontSize="xs" color="text.secondary">
                 {ZONE_COLORS[z].label}
               </Text>
             </Flex>

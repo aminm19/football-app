@@ -94,9 +94,14 @@ High-end premium/agency, modeled on FotMob (reference screenshots studied in
   League's header card (unit 7). Verified visually across Events/Lineups/
   Standings tabs.
 
-### 6. StandingsTable
-- [ ] Refine zone bars, form pills, row density, header/legend styling.
+### 6. StandingsTable — DONE
+- [x] Refine zone bars, form pills, row density, header/legend styling.
 - Files: `client/src/components/StandingsTable.jsx`.
+- Notes: tokenized zone bars/form pills, tightened row density (`size="sm"`),
+  Pts is now the bold headline stat vs. muted secondary P/W/D/L/GD, header
+  row is small uppercase muted labels, thin token-based horizontal
+  separators only. Verified on League Table tab (multi-group UCL 2022) —
+  reads dense-but-legible, closely matches FotMob reference.
 
 ### 7. League page
 - [ ] Reuse gradient banner on header card, restyle pill toggles and pager.
