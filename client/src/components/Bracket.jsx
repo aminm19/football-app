@@ -31,7 +31,7 @@ function RoundColumn({ ties, onTieClick, highlight, teamCodes }) {
 function Bracket({ bracket, onTieClick, highlightTeamIds, teamCodes }) {
   const { rounds } = bracket;
   if (!rounds || rounds.length === 0) {
-    return <Text color="gray.400">No bracket available.</Text>;
+    return <Text color="text.secondary">No bracket available.</Text>;
   }
 
   const highlight = new Set(highlightTeamIds ?? []);
@@ -43,10 +43,10 @@ function Bracket({ bracket, onTieClick, highlightTeamIds, teamCodes }) {
   if (lastRound.ties.length !== 1) {
     return (
       <Box overflowX="auto" py={4}>
-        <Flex align="flex-start" gap={6}>
+        <Flex align="flex-start" gap={10}>
           {rounds.map((r) => (
-            <Flex key={r.name} direction="column" gap={2} flexShrink={0}>
-              <Text fontSize="xs" color="gray.400" fontWeight="semibold" mb={1}>
+            <Flex key={r.name} direction="column" gap={3} flexShrink={0}>
+              <Text fontSize="xs" color="text.secondary" fontWeight="semibold" textTransform="uppercase" letterSpacing="wide" mb={1}>
                 {r.name}
               </Text>
               {r.ties.map((tie, i) => (
@@ -92,29 +92,41 @@ function Bracket({ bracket, onTieClick, highlightTeamIds, teamCodes }) {
   const minHeight = Math.max(tallestColumn * 74, 360);
 
   return (
-    <Box overflowX="auto" py={4}>
-      <Flex align="stretch" gap={6} minH={`${minHeight}px`} w="fit-content" mx="auto">
+    <Box overflowX="auto" py={6}>
+      <Flex align="stretch" gap={10} minH={`${minHeight}px`} w="fit-content" mx="auto">
         {/* LEFT half: rounds in normal order (R16 → QF → SF), flowing right */}
         {leftRounds.map((r) => (
           <RoundColumn key={`L-${r.name}`} ties={r.ties} onTieClick={onTieClick} highlight={highlight} teamCodes={teamCodes} />
         ))}
 
         {/* CENTER: champion + final */}
-        <Flex direction="column" justify="center" align="center" gap={3} flexShrink={0} px={2}>
+        <Flex direction="column" justify="center" align="center" gap={3} flexShrink={0} px={4}>
           {champion ? (
-            <Flex direction="column" align="center" gap={1} mb={2}>
+            <Flex
+              direction="column"
+              align="center"
+              gap={1}
+              mb={3}
+              px={4}
+              py={3}
+              borderWidth="1px"
+              borderColor="#f6c453"
+              borderRadius="lg"
+              bg="bg.raised"
+            >
+              <Box fontSize="18px" color="#f6c453" display="flex"><IoTrophyOutline /></Box>
               <Image src={champion.logo} alt={champion.name} boxSize="40px" />
-              <Text fontSize="sm" fontWeight="bold" textAlign="center">
+              <Text fontSize="sm" fontWeight="bold" color="text.primary" textAlign="center">
                 {champion.name}
               </Text>
-              <Text fontSize="xs" color="gray.400">
+              <Text fontSize="2xs" fontWeight="bold" color="#f6c453" textTransform="uppercase" letterSpacing="wide">
                 Champion
               </Text>
             </Flex>
           ) : (
-            <Flex direction="column" align="center" gap={1} mb={2}>
-              <Box fontSize="40px" color="whiteAlpha.500" display="flex"><IoTrophyOutline /></Box>
-              <Text fontSize="xs" color="gray.500">Champion</Text>
+            <Flex direction="column" align="center" gap={1} mb={3}>
+              <Box fontSize="40px" color="border.subtle" display="flex"><IoTrophyOutline /></Box>
+              <Text fontSize="xs" color="text.secondary">Champion</Text>
             </Flex>
           )}
           {finalTie && (

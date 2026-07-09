@@ -14,19 +14,19 @@ function LegRow({ leg, onNavigate }) {
       py={2}
       px={2}
       borderRadius="md"
-      _hover={{ bg: 'whiteAlpha.100' }}
+      _hover={{ bg: 'bg.raised' }}
     >
-      <Text fontSize="xs" color="gray.400" mb={1}>{date}</Text>
+      <Text fontSize="xs" color="text.secondary" mb={1}>{date}</Text>
       <Flex align="center" justify="space-between">
         <Flex align="center" gap={2} flex={1}>
           <Image src={leg.home_logo} alt={leg.home_team} boxSize="18px" />
-          <Text fontSize="sm">{leg.home_team}</Text>
+          <Text fontSize="sm" color="text.primary">{leg.home_team}</Text>
         </Flex>
-        <Text fontSize="sm" fontWeight="bold" px={3}>
+        <Text fontSize="sm" fontWeight="bold" color="text.primary" px={3}>
           {leg.home_goals} – {leg.away_goals}
         </Text>
         <Flex align="center" gap={2} flex={1} justify="flex-end">
-          <Text fontSize="sm">{leg.away_team}</Text>
+          <Text fontSize="sm" color="text.primary">{leg.away_team}</Text>
           <Image src={leg.away_logo} alt={leg.away_team} boxSize="18px" />
         </Flex>
       </Flex>
@@ -39,9 +39,9 @@ function TieDialog({ tie, open, onClose }) {
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>
-          <Dialog.Content bg="gray.900">
+          <Dialog.Content bg="bg.surface" borderWidth="1px" borderColor="border.subtle">
             <Dialog.Header>
-              <Dialog.Title>
+              <Dialog.Title fontWeight="bold" color="text.primary">
                 {tie?.legs.length > 1 ? 'Two-legged tie' : 'Match'}
               </Dialog.Title>
             </Dialog.Header>

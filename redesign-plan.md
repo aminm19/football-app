@@ -113,11 +113,19 @@ High-end premium/agency, modeled on FotMob (reference screenshots studied in
   matches Home's date-nav pill pattern (unit 4). Verified visually —
   Overview and Fixtures tabs both read cohesively.
 
-### 8. Bracket / TieBox / TieDialog
-- [ ] Apply card system to ties and dialog. Connector lines remain
+### 8. Bracket / TieBox / TieDialog — DONE
+- [x] Apply card system to ties and dialog. Connector lines remain
       deferred/out of scope.
 - Files: `client/src/components/TieBox.jsx`, `client/src/components/Bracket.jsx`,
   `client/src/components/TieDialog.jsx`.
+- Notes: tokenized throughout; winner/loser contrast reinforced (bold
+  primary vs. muted strikethrough secondary); champion slot gets a tasteful
+  one-off gold accent (`#f6c453`, no gold token exists so used directly,
+  decorative-only); round spacing widened; TieDialog surface/hover tokenized.
+  TBD/placeholder dashed-empty-state styling added but not visually
+  exercised (2022 UCL bracket is fully decided) — worth a spot-check next
+  time a live/in-progress bracket is available. No connector lines added
+  (still deferred). Verified visually including TieDialog.
 
 ### 9. Consistency pass
 - [ ] Step back across the whole app, check for drift between restyled and
