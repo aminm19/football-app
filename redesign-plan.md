@@ -82,10 +82,17 @@ High-end premium/agency, modeled on FotMob (reference screenshots studied in
   `MonthCalendar.jsx` reviewed, already fit — untouched. Verified visually,
   including calendar popover.
 
-### 5. Match page
-- [ ] Apply gradient-banner treatment to competition strip/header, restyle
+### 5. Match page — DONE
+- [x] Apply gradient-banner treatment to competition strip/header, restyle
       meta row, score row typography, tabs polish.
 - Files: `client/src/pages/Match.jsx`.
+- Notes: signature aurora-gradient banner shipped — layered radial gradients
+  (blue/green/red, muted) over the competition strip, fading into
+  `bg.surface` below. Score bumped to `4xl`/extrabold as the dominant
+  element, team names secondary. Tab indicator now uses `accent.green`.
+  This is the reference implementation for the same gradient treatment on
+  League's header card (unit 7). Verified visually across Events/Lineups/
+  Standings tabs.
 
 ### 6. StandingsTable
 - [ ] Refine zone bars, form pills, row density, header/legend styling.

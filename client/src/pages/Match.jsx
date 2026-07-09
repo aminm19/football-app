@@ -42,19 +42,19 @@ function Countdown({ target }) {
 
   if (remaining >= DAY_MS) {
     const days = calendarDaysUntil(target);
-    return <Text fontSize="sm" color="gray.400">in {days} {days === 1 ? 'day' : 'days'}</Text>;
+    return <Text fontSize="sm" color="text.secondary">in {days} {days === 1 ? 'day' : 'days'}</Text>;
   }
 
   const totalSec = Math.floor(remaining / 1000);
   const h = String(Math.floor(totalSec / 3600)).padStart(2, '0');
   const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
   const s = String(totalSec % 60).padStart(2, '0');
-  return <Text fontSize="sm" color="gray.400" fontVariantNumeric="tabular-nums">{h}:{m}:{s}</Text>;
+  return <Text fontSize="sm" color="text.secondary" fontVariantNumeric="tabular-nums">{h}:{m}:{s}</Text>;
 }
 
 function MetaItem({ icon: Icon, children }) {
   return (
-    <Flex align="center" gap={1.5} color="gray.400">
+    <Flex align="center" gap={1.5} color="text.secondary">
       <Box fontSize="14px" display="flex"><Icon /></Box>
       <Text fontSize="xs">{children}</Text>
     </Flex>
@@ -109,7 +109,7 @@ function Match() {
   }, [match?.league_id, match?.season, match?.round]);
 
   if (loading) return <Spinner />;
-  if (error) return <Text color="red.400">Error: {error}</Text>;
+  if (error) return <Text color="status.negative">Error: {error}</Text>;
   if (!match) return <Text>Match not found.</Text>;
 
   const {
@@ -144,16 +144,41 @@ function Match() {
   else if (standingsEnabled) tabs.push({ key: 'standings', label: 'Standings' });
 
   return (
-    <Box bg="gray.900" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" overflow="hidden">
-      {/* competition strip */}
-      <Flex align="center" justify="center" gap={2} px={4} py={3}>
-        {league_logo && <Image src={league_logo} alt={league_name} boxSize="18px" />}
-        <Text fontSize="sm" fontWeight="medium">
-          {league_name}{round ? ` · ${round}` : ''}
-        </Text>
-      </Flex>
+    <Box bg="bg.surface" borderWidth="1px" borderColor="border.subtle" borderRadius="xl" overflow="hidden">
+      {/* competition strip — aurora-gradient banner, the redesign's signature flourish */}
+      <Box
+        px={4}
+        py={4}
+        css={{
+          background: `
+            radial-gradient(120% 220% at 8% 10%, rgba(56, 132, 255, 0.45), transparent 55%),
+            radial-gradient(120% 220% at 50% -20%, rgba(16, 185, 129, 0.35), transparent 50%),
+            radial-gradient(120% 220% at 92% 15%, rgba(232, 65, 66, 0.32), transparent 55%),
+            linear-gradient(180deg, rgba(10, 10, 12, 0.05) 0%, var(--chakra-colors-surface) 100%)
+          `,
+        }}
+      >
+        <Flex align="center" justify="center" gap={2}>
+          {league_logo && (
+            <Image
+              src={league_logo}
+              alt={league_name}
+              boxSize="18px"
+              filter="drop-shadow(0 1px 2px rgba(0,0,0,0.6))"
+            />
+          )}
+          <Text
+            fontSize="sm"
+            fontWeight="semibold"
+            color="text.primary"
+            textShadow="0 1px 3px rgba(0,0,0,0.5)"
+          >
+            {league_name}{round ? ` · ${round}` : ''}
+          </Text>
+        </Flex>
+      </Box>
 
-      <Box borderTopWidth="1px" borderColor="whiteAlpha.200" />
+      <Box borderTopWidth="1px" borderColor="border.subtle" />
 
       {/* meta row */}
       <Flex align="center" justify="center" gap={4} wrap="wrap" px={4} py={3}>
@@ -183,8 +208,9 @@ function Match() {
             cursor="pointer"
           >
             <Text
-              fontSize="lg"
+              fontSize="md"
               fontWeight="semibold"
+              color="text.primary"
               textAlign="right"
               _groupHover={{ textDecoration: 'underline' }}
             >
@@ -199,14 +225,22 @@ function Match() {
             />
           </Flex>
         </Flex>
-        <Stack align="center" minW="120px" px={6} gap={1}>
-          <Heading size="xl">{centerText}</Heading>
+        <Stack align="center" minW="140px" px={6} gap={1}>
+          <Heading
+            size="4xl"
+            fontWeight="extrabold"
+            letterSpacing="tight"
+            fontVariantNumeric="tabular-nums"
+            color="text.primary"
+          >
+            {centerText}
+          </Heading>
           {notStarted ? (
             <Countdown target={match_date} />
           ) : isRunning(status_short) ? (
-            <LiveClock match={match} fontSize="sm" fontWeight="semibold" color="green.300" />
+            <LiveClock match={match} fontSize="sm" fontWeight="semibold" color="accent.green" />
           ) : (
-            <Text fontSize="sm" color="gray.400">{subLabel}</Text>
+            <Text fontSize="sm" color="text.secondary">{subLabel}</Text>
           )}
         </Stack>
         <Flex flex={1} justify="flex-start">
@@ -226,8 +260,9 @@ function Match() {
               _groupHover={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.7))' }}
             />
             <Text
-              fontSize="lg"
+              fontSize="md"
               fontWeight="semibold"
+              color="text.primary"
               _groupHover={{ textDecoration: 'underline' }}
             >
               {away_team}
@@ -239,11 +274,17 @@ function Match() {
       {/* tabs — only render if at least one tab is available */}
       {tabs.length > 0 && (
         <>
-          <Box borderTopWidth="1px" borderColor="whiteAlpha.200" />
+          <Box borderTopWidth="1px" borderColor="border.subtle" />
           <Tabs.Root defaultValue={tabs[0].key} colorPalette="green">
             <Tabs.List px={4} css={{ '& [data-selected]': { '--indicator-color': 'transparent' } }}>
               {tabs.map((t) => (
-                <Tabs.Trigger key={t.key} value={t.key}>
+                <Tabs.Trigger
+                  key={t.key}
+                  value={t.key}
+                  color="text.secondary"
+                  fontWeight="medium"
+                  _selected={{ color: 'text.primary' }}
+                >
                   {t.label}
                 </Tabs.Trigger>
               ))}
@@ -253,7 +294,7 @@ function Match() {
                   bottom: '0',
                   height: '3px',
                   borderRadius: '9999px',
-                  background: 'var(--chakra-colors-green-400)',
+                  background: 'var(--chakra-colors-accent-green)',
                   boxShadow: 'none',
                   zIndex: 1,
                 }}
