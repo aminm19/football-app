@@ -103,9 +103,15 @@ High-end premium/agency, modeled on FotMob (reference screenshots studied in
   separators only. Verified on League Table tab (multi-group UCL 2022) —
   reads dense-but-legible, closely matches FotMob reference.
 
-### 7. League page
-- [ ] Reuse gradient banner on header card, restyle pill toggles and pager.
+### 7. League page — DONE
+- [x] Reuse gradient banner on header card, restyle pill toggles and pager.
 - Files: `client/src/pages/League.jsx`.
+- Notes: header card reuses the exact same aurora-gradient recipe as Match
+  page (unit 5) for cross-page consistency; season selector is a glassy pill
+  sitting on the gradient. Tabs tokenized to match Match page. Fixtures'
+  By date/By round toggle is now a proper segmented pill control; pager
+  matches Home's date-nav pill pattern (unit 4). Verified visually —
+  Overview and Fixtures tabs both read cohesively.
 
 ### 8. Bracket / TieBox / TieDialog
 - [ ] Apply card system to ties and dialog. Connector lines remain

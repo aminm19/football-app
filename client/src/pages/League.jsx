@@ -17,7 +17,18 @@ const FINISHED = ['FT', 'AET', 'PEN'];
 
 const INDICATOR_CSS = {
   top: 'auto', bottom: '0', height: '3px', borderRadius: '9999px',
-  background: 'var(--chakra-colors-green-400)', boxShadow: 'none', zIndex: 1,
+  background: 'var(--chakra-colors-accent-green)', boxShadow: 'none', zIndex: 1,
+};
+
+// same aurora-gradient recipe as Match.jsx's competition strip, reused here
+// for the League header card for visual consistency between the two.
+const GRADIENT_BANNER_CSS = {
+  background: `
+    radial-gradient(120% 220% at 8% 10%, rgba(56, 132, 255, 0.45), transparent 55%),
+    radial-gradient(120% 220% at 50% -20%, rgba(16, 185, 129, 0.35), transparent 50%),
+    radial-gradient(120% 220% at 92% 15%, rgba(232, 65, 66, 0.32), transparent 55%),
+    linear-gradient(180deg, rgba(10, 10, 12, 0.05) 0%, var(--chakra-colors-surface) 100%)
+  `,
 };
 
 function dateKey(match) {
@@ -65,9 +76,9 @@ function PillToggle({ active, onClick, children }) {
       borderRadius="full"
       px={4}
       fontWeight="medium"
-      bg={active ? 'white' : 'whiteAlpha.100'}
-      color={active ? 'gray.900' : 'gray.300'}
-      _hover={{ bg: active ? 'white' : 'whiteAlpha.200' }}
+      bg={active ? 'white' : 'transparent'}
+      color={active ? 'bg.canvas' : 'text.secondary'}
+      _hover={{ bg: active ? 'white' : 'bg.raised' }}
       onClick={onClick}
     >
       {children}
@@ -80,7 +91,7 @@ function MatchList({ matches }) {
   return (
     <Stack gap={0} px={3} py={1}>
       {matches.map((m, i) => (
-        <Box key={m.fixture_id} borderTopWidth={i === 0 ? '0' : '1px'} borderColor="whiteAlpha.100">
+        <Box key={m.fixture_id} borderTopWidth={i === 0 ? '0' : '1px'} borderColor="border.muted">
           <MatchRow match={m} />
         </Box>
       ))}
@@ -91,8 +102,8 @@ function MatchList({ matches }) {
 function MatchSection({ label, matches }) {
   return (
     <Box>
-      <Box px={4} py={2} bg="whiteAlpha.100">
-        <Text fontSize="sm" fontWeight="medium">{label}</Text>
+      <Box px={4} py={2} bg="bg.raised">
+        <Text fontSize="sm" fontWeight="medium" color="text.primary">{label}</Text>
       </Box>
       <MatchList matches={matches} />
     </Box>
@@ -151,7 +162,7 @@ function League() {
   }, [id, seasonInUse]);
 
   if (loading) return <Flex justify="center" py={10}><Spinner /></Flex>;
-  if (error) return <Text color="red.400">Error: {error}</Text>;
+  if (error) return <Text color="status.negative">Error: {error}</Text>;
 
   const name = league?.name ?? matches[0]?.league_name ?? 'Competition';
   const logo = league?.logo ?? matches[0]?.league_logo;
@@ -193,39 +204,75 @@ function League() {
   return (
     <Stack gap={4}>
       {/* header card */}
-      <Box bg="gray.900" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" overflow="hidden">
-        <Flex align="center" justify="space-between" px={5} py={4} gap={4} wrap="wrap">
-          <Flex align="center" gap={4}>
-            {logo && <Image src={logo} alt={name} boxSize="52px" objectFit="contain" />}
-            <Stack gap={0}>
-              <Heading size="lg">{name}</Heading>
-              {country && <Text fontSize="sm" color="gray.400">{country}</Text>}
-            </Stack>
-          </Flex>
+      <Box bg="bg.surface" borderWidth="1px" borderColor="border.subtle" borderRadius="xl" overflow="hidden">
+        {/* aurora-gradient banner — same recipe as Match.jsx's competition strip */}
+        <Box px={5} py={5} css={GRADIENT_BANNER_CSS}>
+          <Flex align="center" justify="space-between" gap={4} wrap="wrap">
+            <Flex align="center" gap={4}>
+              {logo && (
+                <Image
+                  src={logo}
+                  alt={name}
+                  boxSize="52px"
+                  objectFit="contain"
+                  filter="drop-shadow(0 1px 3px rgba(0,0,0,0.6))"
+                />
+              )}
+              <Stack gap={0}>
+                <Heading size="lg" color="text.primary" textShadow="0 1px 3px rgba(0,0,0,0.5)">
+                  {name}
+                </Heading>
+                {country && (
+                  <Text fontSize="sm" color="text.secondary" textShadow="0 1px 3px rgba(0,0,0,0.5)">
+                    {country}
+                  </Text>
+                )}
+              </Stack>
+            </Flex>
 
-          {league?.seasons?.length > 0 && (
-            <NativeSelect.Root size="sm" w="auto" bg="whiteAlpha.100" borderRadius="md">
-              <NativeSelect.Field
-                value={seasonInUse ?? ''}
-                onChange={(e) => setSearchParams({ season: e.target.value })}
-                fontWeight="semibold"
+            {league?.seasons?.length > 0 && (
+              <NativeSelect.Root
+                size="sm"
+                w="auto"
+                bg="whiteAlpha.200"
+                borderWidth="1px"
+                borderColor="whiteAlpha.300"
+                borderRadius="full"
               >
-                {league.seasons.map((s) => (
-                  <option key={s.year} value={s.year}>{s.label}</option>
-                ))}
-              </NativeSelect.Field>
-              <NativeSelect.Indicator />
-            </NativeSelect.Root>
-          )}
-        </Flex>
+                <NativeSelect.Field
+                  value={seasonInUse ?? ''}
+                  onChange={(e) => setSearchParams({ season: e.target.value })}
+                  fontWeight="semibold"
+                  color="text.primary"
+                  ps={4}
+                >
+                  {league.seasons.map((s) => (
+                    <option key={s.year} value={s.year}>{s.label}</option>
+                  ))}
+                </NativeSelect.Field>
+                <NativeSelect.Indicator color="text.primary" />
+              </NativeSelect.Root>
+            )}
+          </Flex>
+        </Box>
 
         {/* tabs */}
         <Tabs.Root value={tab} onValueChange={(e) => setTab(e.value)} colorPalette="green">
           <Tabs.List px={5} css={{ '& [data-selected]': { '--indicator-color': 'transparent' } }}>
-            <Tabs.Trigger value="overview">Overview</Tabs.Trigger>
-            <Tabs.Trigger value="table">Table</Tabs.Trigger>
-            {hasBracket && <Tabs.Trigger value="knockout">Knockout</Tabs.Trigger>}
-            <Tabs.Trigger value="fixtures">Fixtures</Tabs.Trigger>
+            <Tabs.Trigger value="overview" color="text.secondary" fontWeight="medium" _selected={{ color: 'text.primary' }}>
+              Overview
+            </Tabs.Trigger>
+            <Tabs.Trigger value="table" color="text.secondary" fontWeight="medium" _selected={{ color: 'text.primary' }}>
+              Table
+            </Tabs.Trigger>
+            {hasBracket && (
+              <Tabs.Trigger value="knockout" color="text.secondary" fontWeight="medium" _selected={{ color: 'text.primary' }}>
+                Knockout
+              </Tabs.Trigger>
+            )}
+            <Tabs.Trigger value="fixtures" color="text.secondary" fontWeight="medium" _selected={{ color: 'text.primary' }}>
+              Fixtures
+            </Tabs.Trigger>
             <Tabs.Indicator css={INDICATOR_CSS} />
           </Tabs.List>
         </Tabs.Root>
@@ -240,14 +287,14 @@ function League() {
             </Box>
           )}
           <Box flex="1" minW="300px">
-            <Box bg="gray.900" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="lg" overflow="hidden">
+            <Box bg="bg.surface" borderWidth="1px" borderColor="border.subtle" borderRadius="lg" overflow="hidden">
               {featuredLabel && (
-                <Flex align="center" px={4} py={3} bg="whiteAlpha.50">
-                  <Text fontWeight="semibold" fontSize="sm">{featuredLabel}</Text>
+                <Flex align="center" px={4} py={3} bg="bg.raised">
+                  <Text fontWeight="semibold" fontSize="sm" color="text.primary">{featuredLabel}</Text>
                 </Flex>
               )}
               {featuredMatches.length === 0 ? (
-                <Text color="gray.400" px={4} py={3}>No fixtures.</Text>
+                <Text color="text.secondary" px={4} py={3}>No fixtures.</Text>
               ) : groupableOverview ? (
                 groupByGroup(featuredMatches, teamToGroup).map(([gName, gMatches]) => (
                   <MatchSection key={gName} label={gName} matches={gMatches} />
@@ -264,7 +311,7 @@ function League() {
       {tab === 'table' && (
         standings
           ? <StandingsTable standings={standings} liveMatches={liveMatches} />
-          : <Text color="gray.400">Standings unavailable for this competition.</Text>
+          : <Text color="text.secondary">Standings unavailable for this competition.</Text>
       )}
 
       {/* knockout */}
@@ -274,9 +321,9 @@ function League() {
 
       {/* fixtures */}
       {tab === 'fixtures' && (
-        <Box bg="gray.900" borderWidth="1px" borderColor="whiteAlpha.200" borderRadius="xl" overflow="hidden">
-          {/* grouping toggle */}
-          <Flex gap={2} px={4} pt={4} pb={3}>
+        <Box bg="bg.surface" borderWidth="1px" borderColor="border.subtle" borderRadius="xl" overflow="hidden">
+          {/* grouping toggle — segmented pill control */}
+          <Flex gap={1} bg="bg.canvas" borderRadius="full" p={1} w="fit-content" mx={4} mt={4} mb={3}>
             <PillToggle active={mode === 'date'} onClick={() => { setMode('date'); setActiveIndex(null); }}>
               By date
             </PillToggle>
@@ -285,9 +332,21 @@ function League() {
             </PillToggle>
           </Flex>
 
-          {/* pager */}
-          <Flex align="center" justify="space-between" px={4} py={2} borderTopWidth="1px" borderColor="whiteAlpha.100">
-            <IconButton aria-label="Previous" size="sm" variant="ghost"
+          {/* pager — pill bar, consistent with Home's date-nav */}
+          <Flex
+            align="center"
+            justify="space-between"
+            bg="bg.surface"
+            borderWidth="1px"
+            borderColor="border.subtle"
+            borderRadius="full"
+            px={2}
+            py={1}
+            mx={4}
+            mb={4}
+          >
+            <IconButton aria-label="Previous" size="sm" variant="ghost" borderRadius="full"
+              _hover={{ bg: 'bg.raised' }}
               disabled={currentIndex === 0}
               onClick={() => setActiveIndex(currentIndex - 1)}>
               <HiChevronLeft />
@@ -298,6 +357,7 @@ function League() {
                 onChange={(e) => setActiveIndex(Number(e.target.value))}
                 textAlign="center"
                 fontWeight="semibold"
+                color="text.primary"
                 bg="transparent"
                 borderWidth="0"
               >
@@ -305,18 +365,21 @@ function League() {
                   <option key={sliceLabel} value={i}>{sliceLabel}</option>
                 ))}
               </NativeSelect.Field>
-              <NativeSelect.Indicator />
+              <NativeSelect.Indicator color="text.secondary" />
             </NativeSelect.Root>
-            <IconButton aria-label="Next" size="sm" variant="ghost"
+            <IconButton aria-label="Next" size="sm" variant="ghost" borderRadius="full"
+              _hover={{ bg: 'bg.raised' }}
               disabled={currentIndex >= slices.length - 1}
               onClick={() => setActiveIndex(currentIndex + 1)}>
               <HiChevronRight />
             </IconButton>
           </Flex>
 
+          <Box borderTopWidth="1px" borderColor="border.subtle" />
+
           {/* matches — both modes show dated headers (with year) */}
           {sliceMatches.length === 0 ? (
-            <Text color="gray.400" px={4} py={3}>No matches found.</Text>
+            <Text color="text.secondary" px={4} py={3}>No matches found.</Text>
           ) : (
             groupByDate(sliceMatches).map(([dLabel, dMatches]) => (
               <MatchSection key={dLabel} label={dLabel} matches={dMatches} />
