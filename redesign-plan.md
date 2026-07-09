@@ -49,9 +49,15 @@ High-end premium/agency, modeled on FotMob (reference screenshots studied in
   canvas/card layering, Inter body text, and the Bebas Neue wordmark all
   render correctly; no regressions.
 
-### 2. Top nav
-- [ ] Restyle wordmark + Home link on the new type system, fix alignment.
+### 2. Top nav — DONE
+- [x] Restyle wordmark + Home link on the new type system, fix alignment.
 - Files: `client/src/App.jsx`.
+- Notes: added a thin `border.subtle` bottom separator so the nav reads as
+  a distinct bar; matched line-height on both links so Bebas Neue (wordmark)
+  and Inter (Home link) sit on the same baseline; wordmark now uses
+  `fontFamily="heading"`/`text.primary`/`accent.green` hover, Home link uses
+  `fontFamily="body"`/`text.secondary` resting/`text.primary` hover. Visually
+  verified on localhost:5173 — clean, balanced, no regressions.
 
 ### 3. MatchRow + status badges
 - [ ] Tighten spacing/alignment, adopt tokenized colors, refine status badge

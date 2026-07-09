@@ -8,27 +8,37 @@ import Team from './pages/Team.jsx';
 function Layout() {
   return (
     <Container maxW="container.md" py={6}>
-      <Flex as="nav" align="center" justify="space-between" mb={6}>
+      <Flex
+        as="nav"
+        align="center"
+        justify="space-between"
+        pb={4}
+        mb={6}
+        borderBottom="1px solid"
+        borderColor="border.subtle"
+      >
         <Link
           as={RouterLink}
           to="/"
-          fontFamily="'Bebas Neue', sans-serif"
-          fontSize="4xl"
+          fontFamily="heading"
+          fontSize="3xl"
           letterSpacing="wider"
-          lineHeight={1}
-          color="white"
-          _hover={{ color: 'green.300', textDecoration: 'none' }}
+          lineHeight="1"
+          color="text.primary"
+          _hover={{ color: 'accent.green', textDecoration: 'none' }}
         >
           Total Football
         </Link>
         <Link
           as={RouterLink}
           to="/"
-          fontFamily="'Bebas Neue', sans-serif"
-          fontSize="2xl"
+          fontFamily="body"
+          fontSize="md"
+          fontWeight="medium"
           letterSpacing="wide"
-          color="gray.300"
-          _hover={{ color: 'white', textDecoration: 'none' }}
+          lineHeight="1"
+          color="text.secondary"
+          _hover={{ color: 'text.primary', textDecoration: 'none' }}
         >
           Home
         </Link>
