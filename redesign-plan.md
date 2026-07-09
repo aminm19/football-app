@@ -70,10 +70,17 @@ High-end premium/agency, modeled on FotMob (reference screenshots studied in
   FotMob's understated status treatment. Verified on Home (grouped lists)
   and League Fixtures tab.
 
-### 4. Home page
-- [ ] Restyle date-nav card, league-group cards, sidebar to new card/spacing
+### 4. Home page — DONE
+- [x] Restyle date-nav card, league-group cards, sidebar to new card/spacing
       system.
 - Files: `client/src/pages/Home.jsx`.
+- Notes: sidebar is now a compact nav list with per-row hover (`bg.raised`);
+  date-nav bar reads as one cohesive pill (chevrons + day-label all
+  `borderRadius="full"` on `bg.surface`); league-group header uses solid
+  `bg.raised` vs. body `bg.surface` so it reads as a section header. All raw
+  `gray.900`/`whiteAlpha.*` in this file migrated to semantic tokens.
+  `MonthCalendar.jsx` reviewed, already fit — untouched. Verified visually,
+  including calendar popover.
 
 ### 5. Match page
 - [ ] Apply gradient-banner treatment to competition strip/header, restyle

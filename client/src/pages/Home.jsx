@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import {
-  Container, Flex, Box, Stack, Heading, Image, Text, Spinner, IconButton, Button, Popover,
+  Container, Flex, Box, Stack, Image, Text, Spinner, IconButton, Button, Popover,
 } from '@chakra-ui/react';
 import { HiChevronLeft, HiChevronRight, HiChevronDown } from 'react-icons/hi2';
 import { getMatchesByDate, getConfig } from '../api.js';
@@ -57,30 +57,42 @@ function TopLeaguesSidebar() {
     <Box
       w="320px"
       flexShrink={0}
-      bg="gray.900"
+      bg="bg.surface"
       borderWidth="1px"
-      borderColor="whiteAlpha.200"
+      borderColor="border.subtle"
       borderRadius="xl"
       overflow="hidden"
       display={{ base: 'none', md: 'block' }}
     >
-      <Heading size="md" px={5} pt={5} pb={3}>Top leagues</Heading>
-      <Stack gap={0} pb={2}>
+      <Text
+        fontSize="xs"
+        fontWeight="semibold"
+        letterSpacing="wide"
+        textTransform="uppercase"
+        color="text.secondary"
+        px={5}
+        pt={5}
+        pb={3}
+      >
+        Top leagues
+      </Text>
+      <Stack gap={0} pb={2} px={2}>
         {TOP_LEAGUES.map((league) => (
           <Flex
             key={league.id}
             as={RouterLink}
             to={`/league/${league.id}`}
             align="center"
-            gap={3.5}
-            px={5}
-            py={3}
+            gap={3}
+            px={3}
+            py={2.5}
+            borderRadius="md"
             cursor="pointer"
             transition="background 0.15s"
-            _hover={{ bg: 'whiteAlpha.100' }}
+            _hover={{ bg: 'bg.raised' }}
           >
-            <Image src={leagueLogo(league.id)} alt={league.name} boxSize="28px" objectFit="contain" />
-            <Text fontSize="md" fontWeight="medium" color="gray.100">{league.name}</Text>
+            <Image src={leagueLogo(league.id)} alt={league.name} boxSize="22px" objectFit="contain" />
+            <Text fontSize="sm" fontWeight="medium" color="text.primary">{league.name}</Text>
           </Flex>
         ))}
       </Stack>
@@ -97,10 +109,10 @@ function MatchList({ loading, error, matches, date }) {
     );
   }
   if (error) {
-    return <Text color="gray.400" py={6} textAlign="center">{error}</Text>;
+    return <Text color="text.secondary" py={6} textAlign="center">{error}</Text>;
   }
   if (matches.length === 0) {
-    return <Text color="gray.400" py={6} textAlign="center">No major matches {dayLabel(date).toLowerCase()}.</Text>;
+    return <Text color="text.secondary" py={6} textAlign="center">No major matches {dayLabel(date).toLowerCase()}.</Text>;
   }
 
   const grouped = matches.reduce((acc, m) => {
@@ -109,15 +121,15 @@ function MatchList({ loading, error, matches, date }) {
   }, {});
 
   return (
-    <Stack gap={3}>
+    <Stack gap={4}>
       {Object.values(grouped).map((leagueMatches) => {
         const first = leagueMatches[0];
         return (
           <Box
             key={first.league_id}
-            bg="gray.900"
+            bg="bg.surface"
             borderWidth="1px"
-            borderColor="whiteAlpha.200"
+            borderColor="border.subtle"
             borderRadius="xl"
             overflow="hidden"
           >
@@ -128,22 +140,21 @@ function MatchList({ loading, error, matches, date }) {
               gap={3}
               px={4}
               py={3.5}
-              bg="whiteAlpha.50"
-              transition="background 0.15s"
-              _hover={{ bg: 'whiteAlpha.100' }}
+              bg="bg.raised"
+              transition="filter 0.15s"
+              _hover={{ filter: 'brightness(1.12)' }}
             >
               {first.league_logo && (
-                <Image src={first.league_logo} alt={first.league_name} boxSize="26px" objectFit="contain" />
+                <Image src={first.league_logo} alt={first.league_name} boxSize="24px" objectFit="contain" />
               )}
-              <Text fontSize="md" fontWeight="semibold">{first.league_name}</Text>
+              <Text fontSize="md" fontWeight="bold" color="text.primary">{first.league_name}</Text>
             </Flex>
-            <Box borderTopWidth="1px" borderColor="whiteAlpha.200" />
             <Stack gap={0} py={1}>
               {leagueMatches.map((m, i) => (
                 <Box
                   key={m.fixture_id}
                   borderTopWidth={i === 0 ? '0' : '1px'}
-                  borderColor="whiteAlpha.100"
+                  borderColor="border.muted"
                 >
                   <MatchRow match={m} />
                 </Box>
@@ -195,7 +206,7 @@ function Home() {
 
   return (
     <Container maxW="6xl" py={8}>
-      <Flex gap={6} align="flex-start">
+      <Flex gap={8} align="flex-start">
         {standingsEnabled && <TopLeaguesSidebar />}
 
         <Box flex={1} minW={0}>
@@ -203,17 +214,19 @@ function Home() {
           <Flex
             align="center"
             justify="space-between"
-            bg="gray.900"
+            bg="bg.surface"
             borderWidth="1px"
-            borderColor="whiteAlpha.200"
-            borderRadius="xl"
-            px={3}
+            borderColor="border.subtle"
+            borderRadius="full"
+            px={2}
             py={2}
-            mb={3}
+            mb={4}
           >
             <IconButton
               aria-label="Previous day"
               variant="ghost"
+              borderRadius="full"
+              _hover={{ bg: 'bg.raised' }}
               onClick={() => setDate((d) => shiftDay(d, -1))}
             >
               <HiChevronLeft />
@@ -224,7 +237,16 @@ function Home() {
               positioning={{ placement: 'bottom' }}
             >
               <Popover.Trigger asChild>
-                <Button variant="ghost" size="sm" fontSize="lg" fontWeight="semibold" gap={1.5}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  fontSize="lg"
+                  fontWeight="semibold"
+                  gap={1.5}
+                  px={4}
+                  borderRadius="full"
+                  _hover={{ bg: 'bg.raised' }}
+                >
                   {dayLabel(date)}
                   <Box
                     as={HiChevronDown}
@@ -234,7 +256,7 @@ function Home() {
                 </Button>
               </Popover.Trigger>
               <Popover.Positioner>
-                <Popover.Content bg="gray.900" borderWidth="1px" borderColor="whiteAlpha.200" w="auto">
+                <Popover.Content bg="bg.surface" borderWidth="1px" borderColor="border.subtle" borderRadius="xl" w="auto">
                   <Popover.Body>
                     <MonthCalendar
                       key={date}
@@ -248,6 +270,8 @@ function Home() {
             <IconButton
               aria-label="Next day"
               variant="ghost"
+              borderRadius="full"
+              _hover={{ bg: 'bg.raised' }}
               onClick={() => setDate((d) => shiftDay(d, 1))}
             >
               <HiChevronRight />
